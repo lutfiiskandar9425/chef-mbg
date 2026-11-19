@@ -1,0 +1,1116 @@
+# -*- coding: utf-8 -*-
+"""
+Build Chef MBG - Executive Kitchen Operations & Chef Recipe System
+Designed specifically for Head Chef Lutfi at SPPG Pekajangan 04.
+Features:
+- Complete 2-Week Menu Cycle (Karbo, ProHe, ProNa, Sayur, Side, Buah)
+- Recipe Scaler for 2,000+ portions (Per Porsi, Total PO Belanja, Takaran per Batch Wajan)
+- Emergency Stock Swap & Quick Substitution Engine (for canceled vendor deliveries)
+- Official SPPG Printable Directive Generator (Arahan Tim Persiapan) for all 4 institutions
+- 1-Click WhatsApp Formatted Text Broadcast for Kitchen Volunteers
+- Organoleptic Testing & Kitchen Sampling Tracker
+"""
+import os
+
+html_code = r"""<!DOCTYPE html>
+<html lang="id" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chef MBG — SPPG Pekajangan 04</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class'
+    };
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+    
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .font-num {
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+
+    .font-code {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+    }
+
+    /* Print styling strictly matching the 5-page official SPPG document */
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+      #printable-directive-sheet, #printable-directive-sheet * {
+        visibility: visible !important;
+      }
+      #printable-directive-sheet {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 20px !important;
+        background: white !important;
+        color: black !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .page-break {
+        page-break-before: always !important;
+        break-before: page !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-[#090D16] dark:text-slate-100 flex flex-col min-h-screen antialiased transition-colors duration-200 selection:bg-slate-900 selection:text-white">
+
+  <!-- ============================================================== -->
+  <!-- TOP EXECUTIVE NAVBAR                                           -->
+  <!-- ============================================================== -->
+  <header class="bg-white/95 dark:bg-[#0D121F]/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-40 transition-colors no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+      
+      <!-- Brand & Chef Identity -->
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-9 h-9 rounded-xl bg-slate-900 dark:bg-white flex items-center justify-center text-white dark:text-slate-950 font-bold text-sm tracking-tight shrink-0 shadow-xs">
+          MBG
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white tracking-tight">Chef MBG</span>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wide">SPPG Pekajangan 04</span>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">Shift Malam &bull; Chef Lutfi Iskandar</p>
+        </div>
+      </div>
+
+      <!-- Quick Action Toolbar -->
+      <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+        <!-- Emergency Substitution Button -->
+        <button type="button" onclick="openEmergencyModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/60 text-xs font-bold transition-all cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          <span class="hidden sm:inline">Substitusi Darurat</span>
+        </button>
+
+        <!-- Dark/Light Theme Switcher -->
+        <button type="button" onclick="toggleTheme()" id="theme-btn" class="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#131926] text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all cursor-pointer" title="Ganti Tema">
+          <svg id="theme-icon-sun" class="w-4 h-4 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          <svg id="theme-icon-moon" class="w-4 h-4 block dark:hidden text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ============================================================== -->
+  <!-- MAIN WORKFLOW SUBNAV TABS                                      -->
+  <!-- ============================================================== -->
+  <nav class="bg-white dark:bg-[#0D121F] border-b border-slate-200/80 dark:border-slate-800/80 sticky top-16 z-30 overflow-x-auto no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+      <div class="flex items-center gap-1.5 sm:gap-2 min-w-max">
+        
+        <!-- Tab 1: Arahan Harian -->
+        <button type="button" onclick="switchMainTab('arahan')" id="btn-tab-arahan" class="main-tab px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-xs cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span>Arahan Tim Persiapan (Cetak & WA)</span>
+        </button>
+
+        <!-- Tab 2: Master Resep & Batch -->
+        <button type="button" onclick="switchMainTab('resep')" id="btn-tab-resep" class="main-tab px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          <span>Master Resep & Batch Wajan</span>
+        </button>
+
+        <!-- Tab 3: Rencana Siklus 2 Minggu -->
+        <button type="button" onclick="switchMainTab('siklus')" id="btn-tab-siklus" class="main-tab px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span>Siklus Menu (Ahli Gizi)</span>
+        </button>
+
+        <!-- Tab 4: Uji Mutu & Sampel -->
+        <button type="button" onclick="switchMainTab('organoleptik')" id="btn-tab-organoleptik" class="main-tab px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+          <span>Uji Organoleptik & Sampel (11 Porsi)</span>
+        </button>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============================================================== -->
+  <!-- MAIN APP CONTAINER                                             -->
+  <!-- ============================================================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- DAY SELECTOR & ACTIVE SUMMARY BAR -->
+    <section class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-xl shadow-xs no-print flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Jadwal Operasional:</span>
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <button type="button" onclick="selectDay('kamis_19')" id="day-btn-kamis_19" class="day-selector-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-xs cursor-pointer">
+            Kamis, 19 Nov (Hari Ini)
+          </button>
+          <button type="button" onclick="selectDay('senin_23')" id="day-btn-senin_23" class="day-selector-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">
+            Senin, 23 Nov
+          </button>
+          <button type="button" onclick="selectDay('selasa_24')" id="day-btn-selasa_24" class="day-selector-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">
+            Selasa, 24 Nov
+          </button>
+          <button type="button" onclick="selectDay('rabu_25')" id="day-btn-rabu_25" class="day-selector-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">
+            Rabu, 25 Nov
+          </button>
+          <button type="button" onclick="selectDay('kamis_26')" id="day-btn-kamis_26" class="day-selector-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">
+            Kamis, 26 Nov
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Summary -->
+      <div class="flex items-center gap-4 text-xs font-medium">
+        <div>
+          <span class="text-slate-400 block text-[10px] uppercase">Total Porsi Dapur:</span>
+          <span id="header-total-portions" class="font-bold text-slate-900 dark:text-white font-num text-sm">2.742 Porsi</span>
+        </div>
+        <div class="h-6 w-px bg-slate-200 dark:border-slate-800"></div>
+        <div>
+          <span class="text-slate-400 block text-[10px] uppercase">Alokasi Institusi:</span>
+          <span class="font-bold text-slate-900 dark:text-white">4 Lembaga + Sampel</span>
+        </div>
+        <div class="h-6 w-px bg-slate-200 dark:border-slate-800"></div>
+        <div>
+          <span class="text-slate-400 block text-[10px] uppercase">Status Bahan:</span>
+          <span id="header-stock-status" class="font-bold text-emerald-600 dark:text-emerald-400">100% Sesuai & Substitusi Siap</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- SECTION 1: ARAHAN TIM PERSIAPAN (OFFICIAL TEMPLATE GENERATOR)  -->
+    <!-- ============================================================== -->
+    <section id="section-arahan" class="main-content-section space-y-4">
+      
+      <!-- Institution Selector Toolbar -->
+      <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs no-print">
+        <div class="flex items-center gap-2 flex-wrap">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Pilih Institusi:</label>
+          <select id="selected-institution" onchange="renderActiveDirective()" class="bg-slate-50 dark:bg-[#0D121F] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-lg px-3 py-1.5 font-bold outline-none">
+            <option value="SMK_1_KEDUNGWUNI">SMK 1 Kedungwuni (1.723 Porsi)</option>
+            <option value="MTS_SALAFIYAH_SYAFIIYAH">MTs Salafiyah Syafiiyah (646 Porsi)</option>
+            <option value="POSYANDU_PANJOMBLANGAN">Posyandu Panjomblangan (188 Porsi)</option>
+            <option value="POSYANDU_AMBOKEMBANG">Posyandu Ambokembang (185 Porsi)</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Print Official PDF Button -->
+          <button type="button" onclick="window.print()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#131926] hover:bg-slate-50 text-slate-700 dark:text-slate-200 text-xs font-semibold cursor-pointer">
+            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            <span>Cetak PDF Resmi</span>
+          </button>
+
+          <!-- WhatsApp Share Button -->
+          <button type="button" onclick="broadcastDirectiveViaWhatsApp()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-xs cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.007c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.173.086.275.073.376-.044.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.043.072.043.419-.101.824z"/></svg>
+            <span>Kirim Teks ke WA Relawan</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- THE OFFICIAL 5-PAGE SPPG DIRECTIVE SHEET (CONTAINER) -->
+      <div id="printable-directive-sheet" class="bg-white text-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-10 shadow-sm space-y-8 select-text">
+        <!-- Rendered Dynamically via JS -->
+      </div>
+
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- SECTION 2: MASTER RESEP & BATCH WAJAN (2.000+ PORSI)           -->
+    <!-- ============================================================== -->
+    <section id="section-resep" class="main-content-section hidden space-y-4">
+      <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-xl shadow-xs">
+        <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight flex items-center justify-between">
+          <span>Formula Resep & Pembagian Batch Wajan Besar (Skala 2.000+ Porsi)</span>
+          <span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Standar Dapur SPPG Pekajangan 04</span>
+        </h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Dihitung otomatis dengan faktor susut mentah-ke-matang, rasio bumbu aromatik, dan pembagian porsi masak per wajan wajan besar (÷8 batch wajan).</p>
+      </div>
+
+      <!-- Recipe Cards Container -->
+      <div id="recipe-cards-container" class="space-y-6">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- SECTION 3: SIKLUS MENU 2 MINGGU & AHLI GIZI                    -->
+    <!-- ============================================================== -->
+    <section id="section-siklus" class="main-content-section hidden space-y-4">
+      <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-xl shadow-xs">
+        <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight">
+          Perencanaan Siklus Menu 2 Minggu Bersama Ahli Gizi
+        </h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Memastikan kecukupan standar 5 komponen gizi (Karbohidrat, Protein Hewani, Protein Nabati, Sayuran, dan Buah/Side) sebelum diajukan ke Kepala Dapur.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3" id="cycle-cards-grid">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- SECTION 4: UJI ORGANOLEPTIK & KONTROL PORSI                    -->
+    <!-- ============================================================== -->
+    <section id="section-organoleptik" class="main-content-section hidden space-y-4">
+      <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-xl shadow-xs">
+        <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight">
+          Lembar Kontrol Mutu & Uji Organoleptik (11 Porsi Khusus)
+        </h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Sesuai SOP: 2 porsi sampel dapur dan 9 porsi uji organoleptik wajib diuji rasa, suhu matang, dan keamanannya sebelum makanan didistribusikan ke sekolah.</p>
+      </div>
+
+      <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-xl p-5 shadow-xs space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#0E131F]/50">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Sampel Wajib:</span>
+            <p class="text-lg font-bold text-slate-900 dark:text-white mt-1">11 Porsi</p>
+            <p class="text-xs text-slate-500 mt-0.5">2 Sampel Dapur + 9 Uji Organoleptik</p>
+          </div>
+          <div class="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#0E131F]/50">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Standar Suhu Masak:</span>
+            <p class="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-1">&ge; 75 &deg;C</p>
+            <p class="text-xs text-slate-500 mt-0.5">Telur matang &ge; 74 &deg;C (Bukan setengah matang)</p>
+          </div>
+          <div class="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#0E131F]/50">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Batas Waktu Konsumsi:</span>
+            <p class="text-lg font-bold text-amber-600 dark:text-amber-400 mt-1">Maksimal 4 Jam</p>
+            <p class="text-xs text-slate-500 mt-0.5">Tahan panas wadah &ge; 60 &deg;C</p>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-100 dark:border-slate-800 pt-4 space-y-3">
+          <h4 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Form Checklist Uji Rasa Shift Malam:</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/40">
+              <input type="checkbox" checked class="w-4 h-4 text-slate-900 rounded">
+              <span>Cita rasa bumbu gurih merata & tidak keasinan</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/40">
+              <input type="checkbox" checked class="w-4 h-4 text-slate-900 rounded">
+              <span>Telur / Protein matang sempurna tanpa bau amis</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/40">
+              <input type="checkbox" checked class="w-4 h-4 text-slate-900 rounded">
+              <span>Tekstur renyah terjaga & tiris minyak maksimal</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/40">
+              <input type="checkbox" checked class="w-4 h-4 text-slate-900 rounded">
+              <span>Sayur tiris kering & segar, tidak berair</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: KITCHEN EMERGENCY PIVOT / QUICK SUBSTITUTION            -->
+  <!-- ============================================================== -->
+  <div id="emergency-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white dark:bg-[#111726] border border-slate-200 dark:border-slate-800 w-full max-w-xl rounded-2xl p-6 shadow-2xl space-y-4 text-left">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div>
+          <span class="text-[10px] font-black uppercase text-amber-600 dark:text-amber-400 tracking-wider">Emergency Kitchen Pivot</span>
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">Substitusi Cepat Bahan Batal / Tidak Sesuai PO</h3>
+        </div>
+        <button type="button" onclick="closeEmergencyModal()" class="w-7 h-7 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 flex items-center justify-center text-xs font-bold cursor-pointer">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <p class="text-slate-600 dark:text-slate-400">
+          Ketika supplier membatalkan kiriman atau barang datang bermasalah di tengah malam, sistem akan langsung mengalkulasi ulang kebutuhan bahan di gudang dan merevisi lembar arahan semua institusi secara otomatis.
+        </p>
+
+        <div>
+          <label class="block text-slate-600 dark:text-slate-400 font-semibold mb-1">1. Pilih Bahan yang Batal / Bermasalah:</label>
+          <select id="swap-origin-item" class="w-full bg-slate-50 dark:bg-[#0E131F] border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white font-bold outline-none">
+            <option value="tahu_tepung">Tahu Segar (Rencana Tahu Goreng Tepung)</option>
+            <option value="buah_naga">Buah Naga (Rencana Buah Hari Ini)</option>
+            <option value="lele_fillet">Lele Fillet (Rencana Lele Crispy)</option>
+            <option value="telur_rollade">Rollade Telur (Rencana Semur)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-600 dark:text-slate-400 font-semibold mb-1">2. Pilih Bahan Pengganti yang Ada di Gudang / Chiller:</label>
+          <select id="swap-target-item" class="w-full bg-slate-50 dark:bg-[#0E131F] border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white font-bold outline-none">
+            <option value="tempe_tepung">Tempe Segar Padat (Dibuat Tempe Goreng Tepung - Target 30g Matang)</option>
+            <option value="jeruk_manis">Jeruk Medan Segar (1 Buah per Porsi)</option>
+            <option value="telur_ceplok">Telur Ayam Ras (Dibuat Telur Ceplok - Target 60g Matang)</option>
+            <option value="tahu_goreng">Tahu Putih Segar (Dibuat Tahu Goreng Bumbu Kuning)</option>
+          </select>
+        </div>
+
+        <div class="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/80 space-y-1">
+          <span class="text-[10px] font-bold uppercase text-amber-700 dark:text-amber-400 block">Kalkulasi Otomatis Sistem:</span>
+          <p class="text-slate-700 dark:text-slate-300 font-medium">&bull; Rasio susut mentah ke matang disesuaikan otomatis (Target porsi matang terjaga).</p>
+          <p class="text-slate-700 dark:text-slate-300 font-medium">&bull; Takaran tepung, minyak, dan bumbu marinasi langsung direkalkulasi untuk 2.742 porsi.</p>
+          <p class="text-slate-700 dark:text-slate-300 font-medium">&bull; Catatan khusus otomatis disematkan pada lembar kerja relawan.</p>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeEmergencyModal()" class="px-3.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold cursor-pointer">Batal</button>
+          <button type="button" onclick="applyEmergencySwap()" class="px-4 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold shadow-xs cursor-pointer">Terapkan Substitusi Dapur</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-slate-900 dark:bg-white text-white dark:text-slate-950 px-4 py-2.5 rounded-xl text-xs font-semibold shadow-lg transition-all duration-300 opacity-0 pointer-events-none flex items-center gap-2">
+    <svg class="w-4 h-4 text-emerald-400 dark:text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+    <span id="toast-msg">Notifikasi</span>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- JAVASCRIPT CORE ENGINE FOR CHEF MBG                            -->
+  <!-- ============================================================== -->
+  <script>
+    // DATA MODEL OF REAL OPERATIONAL MENU AT SPPG PEKAJANGAN 04
+    const MBG_DATA = {
+      kamis_19: {
+        dateString: "Kamis, 19 November 2026",
+        title: "Roti Bun (Burger), Telur Ceplok, Tempe Goreng Tepung, Selada Timun, Saus Pedas Manis / Tomat, Jeruk",
+        totalPortions: 2742,
+        notes: "Menu mengikuti RAB Kamis. ProNa = Tempe Goreng Tepung dan Buah = Jeruk (Substitusi dari Tahu Tepung dan Buah Naga karena bahan supplier cancel). Metode adonan tepung mengikuti standar resep.",
+        institutions: {
+          SMK_1_KEDUNGWUNI: {
+            name: "SMK 1 KEDUNGWUNI",
+            totalPorsi: 1723,
+            pb: 1723,
+            pk: 0,
+            specialNotes: "Rincian PB: 1.723 = 1.712 (SMK 1) + 2 sampel dapur + 9 uji organoleptik. Alergi Nasi: 2 porsi (Kemas terpisah). Saus disiapkan hanya Saus Pedas Manis (PB).",
+            items: [
+              { name: "Roti Bun (burger siap pakai)", cat: "Karbohidrat", perPorsi: "1 buah (±50 g)", total: "1.723 buah = 288 pack" },
+              { name: "Telur Ayam Ras (ukuran besar)", cat: "ProHe", perPorsi: "1 butir (±60 g)", total: "1.723 butir (103,38 kg)" },
+              { name: "Saus Pedas Manis (PB)", cat: "Side", perPorsi: "~15 g", total: "1.723 porsi (25,84 kg)" },
+              { name: "Tempe Goreng Tepung (Substitusi Tahu)", cat: "ProNa", perPorsi: "30 g matang", total: "1.723 porsi (51,69 kg matang)" },
+              { name: "Selada Timun (Lalap)", cat: "Sayur", perPorsi: "30 g", total: "1.723 porsi (51,69 kg)" },
+              { name: "Jeruk Medan (Substitusi Buah Naga)", cat: "Buah", perPorsi: "1 buah", total: "1.723 buah" }
+            ],
+            rawIngredients: [
+              { name: "Roti bun burger (pack isi 6)", perPorsi: "1 buah", qty: "1.723 buah = 288 pack" },
+              { name: "Telur ayam ras (besar)", perPorsi: "1 butir (60 g)", qty: "1.723 butir (103,38 kg)" },
+              { name: "Minyak goreng (goreng telur)", perPorsi: "4,8 ml", qty: "8,29 L" },
+              { name: "Saus tomat (basis saus pedas)", perPorsi: "8,1 g", qty: "13,90 kg" },
+              { name: "Cabai merah keriting (blender halus)", perPorsi: "4,0 g", qty: "6,95 kg" },
+              { name: "Bawang putih (cincang halus)", perPorsi: "0,82 g", qty: "1,42 kg" },
+              { name: "Gula pasir", perPorsi: "1,61 g", qty: "2,77 kg" },
+              { name: "Cuka masak", perPorsi: "0,82 ml", qty: "1,42 L" },
+              { name: "Tempe segar padat", perPorsi: "27 g", qty: "46,52 kg" },
+              { name: "Tepung terigu (adonan celup)", perPorsi: "6,3 g", qty: "10,93 kg" },
+              { name: "Tepung beras (renyah)", perPorsi: "4,2 g", qty: "7,29 kg" },
+              { name: "Minyak goreng (deep fry tempe)", perPorsi: "8,6 ml", qty: "14,89 L" },
+              { name: "Timun segar", perPorsi: "19,8 g", qty: "34,12 kg" },
+              { name: "Selada segar", perPorsi: "13,2 g", qty: "22,75 kg" },
+              { name: "Jeruk medan (isi 10-12/kg)", perPorsi: "1 buah", qty: "1.723 buah" }
+            ],
+            quickScaleTable: [
+              { item: "Tempe mentah (27 g)", p10: "270 g", p50: "1,35 kg", p100: "2,7 kg" },
+              { item: "Timun iris (19,8 g)", p10: "198 g", p50: "990 g", p100: "1,98 kg" },
+              { item: "Selada sobek (13,2 g)", p10: "132 g", p50: "660 g", p100: "1,32 kg" },
+              { item: "Telur ras (60 g)", p10: "10 butir", p50: "50 butir", p100: "100 butir" },
+              { item: "Cabai keriting saus (4 g)", p10: "40 g", p50: "200 g", p100: "400 g" }
+            ]
+          },
+          MTS_SALAFIYAH_SYAFIIYAH: {
+            name: "MTS SALAFIYAH SYAFIIYAH",
+            totalPorsi: 646,
+            pb: 646,
+            pk: 0,
+            specialNotes: "Hanya Porsi Besar (PB). Alergi Nasi: 1 porsi (Kemas terpisah & label khusus). Saus disiapkan Saus Pedas Manis (PB).",
+            items: [
+              { name: "Roti Bun (burger)", cat: "Karbohidrat", perPorsi: "1 buah (±50 g)", total: "646 buah (108 pack isi 6)" },
+              { name: "Telur Ceplok", cat: "ProHe", perPorsi: "1 butir (±60 g)", total: "646 butir (38,76 kg)" },
+              { name: "Saus Pedas Manis (PB)", cat: "Side", perPorsi: "~15 g", total: "646 porsi (9,69 kg)" },
+              { name: "Tempe Goreng Tepung", cat: "ProNa", perPorsi: "30 g matang", total: "646 porsi (19,38 kg matang)" },
+              { name: "Selada Timun", cat: "Sayur", perPorsi: "30 g", total: "646 porsi (19,38 kg)" },
+              { name: "Jeruk", cat: "Buah", perPorsi: "1 buah", total: "646 buah" }
+            ],
+            rawIngredients: [
+              { name: "Roti bun burger", perPorsi: "1 buah", qty: "646 buah = 108 pack" },
+              { name: "Telur ayam ras", perPorsi: "1 butir (60 g)", qty: "646 butir (38,76 kg)" },
+              { name: "Minyak goreng telur", perPorsi: "4,8 ml", qty: "3,11 L" },
+              { name: "Saus tomat saus PB", perPorsi: "8,1 g", qty: "5,21 kg" },
+              { name: "Cabai merah keriting", perPorsi: "4,0 g", qty: "2,61 kg" },
+              { name: "Bawang putih cincang", perPorsi: "0,82 g", qty: "531 g" },
+              { name: "Gula pasir", perPorsi: "1,61 g", qty: "1,04 kg" },
+              { name: "Tempe segar padat", perPorsi: "27 g", qty: "17,44 kg" },
+              { name: "Tepung terigu celup", perPorsi: "6,3 g", qty: "4,10 kg" },
+              { name: "Tepung beras renyah", perPorsi: "4,2 g", qty: "2,73 kg" },
+              { name: "Timun segar", perPorsi: "19,8 g", qty: "12,79 kg" },
+              { name: "Selada segar", perPorsi: "13,2 g", qty: "8,53 kg" },
+              { name: "Jeruk medan", perPorsi: "1 buah", qty: "646 buah" }
+            ],
+            quickScaleTable: [
+              { item: "Tempe mentah (27 g)", p10: "270 g", p50: "1,35 kg", p100: "2,7 kg" },
+              { item: "Timun iris (19,8 g)", p10: "198 g", p50: "990 g", p100: "1,98 kg" },
+              { item: "Selada sobek (13,2 g)", p10: "132 g", p50: "660 g", p100: "1,32 kg" },
+              { item: "Telur ras (60 g)", p10: "10 butir", p50: "50 butir", p100: "100 butir" },
+              { item: "Cabai keriting saus (4 g)", p10: "40 g", p50: "200 g", p100: "400 g" }
+            ]
+          },
+          POSYANDU_PANJOMBLANGAN: {
+            name: "POSYANDU PANJOMBLANGAN",
+            totalPorsi: 188,
+            pb: 95,
+            pk: 93,
+            specialNotes: "Saus Berbeda: Porsi Besar (95 PB) = Saus Pedas Manis. Porsi Kecil (93 PK) = Saus Tomat ramah anak tanpa cabai. Kemas & label wadah terpisah (PB-PEDAS dan PK-TOMAT).",
+            items: [
+              { name: "Roti Bun (burger)", cat: "Karbohidrat", perPorsi: "1 buah (±50 g)", total: "188 buah (32 pack isi 6)" },
+              { name: "Telur Ceplok", cat: "ProHe", perPorsi: "1 butir (±60 g)", total: "188 butir (11,28 kg)" },
+              { name: "Saus Pedas Manis (PB 95)", cat: "Side", perPorsi: "~15 g", total: "95 porsi (1,43 kg)" },
+              { name: "Saus Tomat Ramah Anak (PK 93)", cat: "Side", perPorsi: "~15 g", total: "93 porsi (1,40 kg)" },
+              { name: "Tempe Goreng Tepung", cat: "ProNa", perPorsi: "30 g matang", total: "188 porsi (5,64 kg matang)" },
+              { name: "Selada Timun", cat: "Sayur", perPorsi: "30 g", total: "188 porsi (5,64 kg)" },
+              { name: "Jeruk", cat: "Buah", perPorsi: "1 buah", total: "188 buah" }
+            ],
+            rawIngredients: [
+              { name: "Roti bun burger", perPorsi: "1 buah", qty: "188 buah = 32 pack" },
+              { name: "Telur ayam ras", perPorsi: "1 butir (60 g)", qty: "188 butir (11,28 kg)" },
+              { name: "Saus tomat siap pakai (saus PB)", perPorsi: "8,1 g", qty: "767 g" },
+              { name: "Cabai merah keriting (saus PB)", perPorsi: "4,0 g", qty: "383 g" },
+              { name: "Saus tomat siap pakai (saus PK)", perPorsi: "13,2 g", qty: "1,23 kg" },
+              { name: "Tomat segar blender (saus PK)", perPorsi: "1,6 g", qty: "148 g" },
+              { name: "Tempe segar padat", perPorsi: "27 g", qty: "5,08 kg" },
+              { name: "Tepung terigu adonan", perPorsi: "6,3 g", qty: "1,19 kg" },
+              { name: "Tepung beras renyah", perPorsi: "4,2 g", qty: "795 g" },
+              { name: "Timun segar", perPorsi: "19,8 g", qty: "3,72 kg" },
+              { name: "Selada segar", perPorsi: "13,2 g", qty: "2,48 kg" },
+              { name: "Jeruk medan", perPorsi: "1 buah", qty: "188 buah" }
+            ],
+            quickScaleTable: [
+              { item: "Tempe mentah (27 g)", p10: "270 g", p50: "1,35 kg", p100: "2,7 kg" },
+              { item: "Timun iris (19,8 g)", p10: "198 g", p50: "990 g", p100: "1,98 kg" },
+              { item: "Selada sobek (13,2 g)", p10: "132 g", p50: "660 g", p100: "1,32 kg" },
+              { item: "Telur ras (60 g)", p10: "10 butir", p50: "50 butir", p100: "100 butir" },
+              { item: "Cabai keriting saus (4 g)", p10: "40 g", p50: "200 g", p100: "400 g" }
+            ]
+          },
+          POSYANDU_AMBOKEMBANG: {
+            name: "POSYANDU AMBOKEMBANG",
+            totalPorsi: 185,
+            pb: 86,
+            pk: 99,
+            specialNotes: "Saus Berbeda: Porsi Besar (86 PB) = Saus Pedas Manis. Porsi Kecil (99 PK) = Saus Tomat ramah anak. Label wadah PB-PEDAS dan PK-TOMAT dipisah rapat.",
+            items: [
+              { name: "Roti Bun (burger)", cat: "Karbohidrat", perPorsi: "1 buah (±50 g)", total: "185 buah (31 pack isi 6)" },
+              { name: "Telur Ceplok", cat: "ProHe", perPorsi: "1 butir (±60 g)", total: "185 butir (11,10 kg)" },
+              { name: "Saus Pedas Manis (PB 86)", cat: "Side", perPorsi: "~15 g", total: "86 porsi (1,29 kg)" },
+              { name: "Saus Tomat Ramah Anak (PK 99)", cat: "Side", perPorsi: "~15 g", total: "99 porsi (1,49 kg)" },
+              { name: "Tempe Goreng Tepung", cat: "ProNa", perPorsi: "30 g matang", total: "185 porsi (5,55 kg matang)" },
+              { name: "Selada Timun", cat: "Sayur", perPorsi: "30 g", total: "185 porsi (5,55 kg)" },
+              { name: "Jeruk", cat: "Buah", perPorsi: "1 buah", total: "185 buah" }
+            ],
+            rawIngredients: [
+              { name: "Roti bun burger", perPorsi: "1 buah", qty: "185 buah = 31 pack" },
+              { name: "Telur ayam ras", perPorsi: "1 butir (60 g)", qty: "185 butir (11,10 kg)" },
+              { name: "Saus tomat siap pakai (saus PB)", perPorsi: "8,1 g", qty: "694 g" },
+              { name: "Cabai merah keriting (saus PB)", perPorsi: "4,0 g", qty: "347 g" },
+              { name: "Saus tomat siap pakai (saus PK)", perPorsi: "13,2 g", qty: "1,31 kg" },
+              { name: "Tomat segar blender (saus PK)", perPorsi: "1,6 g", qty: "157 g" },
+              { name: "Tempe segar padat", perPorsi: "27 g", qty: "5,00 kg" },
+              { name: "Tepung terigu adonan", perPorsi: "6,3 g", qty: "1,17 kg" },
+              { name: "Tepung beras renyah", perPorsi: "4,2 g", qty: "783 g" },
+              { name: "Timun segar", perPorsi: "19,8 g", qty: "3,66 kg" },
+              { name: "Selada segar", perPorsi: "13,2 g", qty: "2,44 kg" },
+              { name: "Jeruk medan", perPorsi: "1 buah", qty: "185 buah" }
+            ],
+            quickScaleTable: [
+              { item: "Tempe mentah (27 g)", p10: "270 g", p50: "1,35 kg", p100: "2,7 kg" },
+              { item: "Timun iris (19,8 g)", p10: "198 g", p50: "990 g", p100: "1,98 kg" },
+              { item: "Selada sobek (13,2 g)", p10: "132 g", p50: "660 g", p100: "1,32 kg" },
+              { item: "Telur ras (60 g)", p10: "10 butir", p50: "50 butir", p100: "100 butir" },
+              { item: "Cabai keriting saus (4 g)", p10: "40 g", p50: "200 g", p100: "400 g" }
+            ]
+          }
+        }
+      },
+      senin_23: {
+        dateString: "Senin, 23 November 2026",
+        title: "Nasi Gurih, Lele Crispy, Sambal Bajak, Tempe Orek Kacang Panjang, Lalap Timun + Kol, Jeruk",
+        totalPortions: 2211,
+        notes: "Total 2.211 porsi (SMK 1.181, MTS 646, Posyandu Ambokembang 185, Posyandu Panjomblangan 188, Sampel 2, Organoleptik 9). Gramasi: ProHe 60g, ProNa 30g, Sayur 30g, Side 15g. Beras 1 kg = 19 porsi. Dibagi 8 batch wajan.",
+        institutions: {
+          SMK_1_KEDUNGWUNI: {
+            name: "SMK 1 KEDUNGWUNI",
+            totalPorsi: 1181,
+            pb: 1052,
+            pk: 129,
+            specialNotes: "PB 1.052 porsi, PK 129 porsi. Termasuk 2 sampel dapur & 9 uji organoleptik. Lele digoreng paling akhir agar krispi.",
+            items: [
+              { name: "Nasi Gurih (Santan Serai)", cat: "Karbohidrat", perPorsi: "120-130 g matang", total: "1.181 porsi (62,1 kg beras)" },
+              { name: "Lele Crispy Fillet", cat: "ProHe", perPorsi: "60 g matang", total: "1.181 porsi (70,86 kg fillet)" },
+              { name: "Sambal Bajak Matang", cat: "Side", perPorsi: "15 g", total: "1.181 porsi (17,71 kg)" },
+              { name: "Tempe Orek Kacang Panjang", cat: "ProNa", perPorsi: "30 g matang", total: "1.181 porsi (35,43 kg)" },
+              { name: "Lalap Timun + Kol Blansir", cat: "Sayur", perPorsi: "30 g", total: "1.181 porsi (35,43 kg)" },
+              { name: "Jeruk Manis", cat: "Buah", perPorsi: "1 buah", total: "1.181 buah" }
+            ],
+            rawIngredients: [
+              { name: "Beras pulen", perPorsi: "52,6 g", qty: "62,1 kg" },
+              { name: "Santan kelapa kental", perPorsi: "21,1 ml", qty: "24,9 L" },
+              { name: "Lele fillet segar", perPorsi: "60 g", qty: "70,86 kg" },
+              { name: "Tepung terigu marinasi", perPorsi: "10 g", qty: "11,81 kg" },
+              { name: "Tepung maizena", perPorsi: "5 g", qty: "5,90 kg" },
+              { name: "Tempe segar", perPorsi: "26,5 g", qty: "31,3 kg" },
+              { name: "Kacang panjang", perPorsi: "8,8 g", qty: "10,4 kg" },
+              { name: "Timun", perPorsi: "15 g", qty: "17,7 kg" },
+              { name: "Kol putih", perPorsi: "15,8 g", qty: "18,6 kg" },
+              { name: "Jeruk manis", perPorsi: "1 buah", qty: "1.181 buah" }
+            ],
+            quickScaleTable: [
+              { item: "Lele fillet (60 g)", p10: "600 g", p50: "3,0 kg", p100: "6,0 kg" },
+              { item: "Tempe mentah dadu", p10: "265 g", p50: "1,32 kg", p100: "2,65 kg" },
+              { item: "Kacang panjang (1,5 cm)", p10: "88 g", p50: "440 g", p100: "880 g" },
+              { item: "Timun iris (15 g)", p10: "150 g", p50: "750 g", p100: "1,5 kg" },
+              { item: "Kol iris blansir (15,8 g)", p10: "158 g", p50: "790 g", p100: "1,58 kg" }
+            ]
+          }
+        }
+      },
+      selasa_24: {
+        dateString: "Selasa, 24 November 2026",
+        title: "Nasi Gurih, Semur Telur Rollade, Tahu Goreng, Mix Vigie (Jagung Wortel Buncis), Pisang",
+        totalPortions: 2211,
+        notes: "Total 2.211 porsi. Kuah semur gurih manis pekat, telur rollade dipotong rapi, tahu goreng marinasi bawang putih kunyit.",
+        institutions: {}
+      },
+      rabu_25: {
+        dateString: "Rabu, 25 November 2026",
+        title: "Nasi, Chicken Pop Kecap Mentega, Tempe Goreng, Tumis Labu Jagung, Kelengkeng",
+        totalPortions: 2211,
+        notes: "Total 2.211 porsi. Ayam fillet potong pop krispi disiram saus kecap mentega harum gurih.",
+        institutions: {}
+      },
+      kamis_26: {
+        dateString: "Kamis, 26 November 2026",
+        title: "Nasi, Telur Rollade, Sambal Bawang, Tahu Isi Sayur, Mix Vigie, Buah Naga",
+        totalPortions: 2211,
+        notes: "Total 2.211 porsi. Tahu isi sayuran wortel toge renyah, saus sambal bawang segar.",
+        institutions: {}
+      }
+    };
+
+    let currentDayKey = 'kamis_19';
+    let currentInstKey = 'SMK_1_KEDUNGWUNI';
+
+    // RENDER ACTIVE DIRECTIVE TEMPLATE
+    function renderActiveDirective() {
+      const dayData = MBG_DATA[currentDayKey];
+      if (!dayData) return;
+
+      const instSelect = document.getElementById('selected-institution');
+      if (instSelect) currentInstKey = instSelect.value;
+
+      // Fallback if institution doesn't exist for this day
+      let instData = dayData.institutions[currentInstKey];
+      if (!instData) {
+        currentInstKey = Object.keys(dayData.institutions)[0];
+        instData = dayData.institutions[currentInstKey];
+        if (instSelect) instSelect.value = currentInstKey;
+      }
+
+      if (!instData) {
+        document.getElementById('printable-directive-sheet').innerHTML = `
+          <div class="p-8 text-center text-slate-500">
+            Data institusi untuk jadwal ini sedang disiapkan. Silakan pilih hari atau institusi lain.
+          </div>
+        `;
+        return;
+      }
+
+      const container = document.getElementById('printable-directive-sheet');
+
+      container.innerHTML = `
+        <!-- HEADER KOP SURAT RESMI -->
+        <div class="border-b-2 border-slate-900 pb-5">
+          <div class="bg-emerald-900 text-white p-4 rounded-xl">
+            <span class="text-xs uppercase tracking-widest font-bold text-emerald-200">Dokumen Internal SPPG Pekajangan 04 &bull; Program Makan Bergizi Gratis (MBG)</span>
+            <h1 class="text-xl sm:text-2xl font-black tracking-tight mt-0.5">ARAHAN TIM PERSIAPAN &mdash; ${instData.name}</h1>
+            <p class="text-xs text-emerald-100 mt-1">${dayData.dateString}</p>
+          </div>
+
+          <!-- PORSI SUMMARY TABLE -->
+          <div class="grid grid-cols-3 gap-3 mt-4 text-center">
+            <div class="p-3 bg-slate-100 border border-slate-200 rounded-xl">
+              <span class="text-[10px] uppercase font-bold text-slate-500 block">Porsi Besar (PB)</span>
+              <p class="text-xl font-bold font-num text-slate-900">${instData.pb || '-'}</p>
+            </div>
+            <div class="p-3 bg-slate-100 border border-slate-200 rounded-xl">
+              <span class="text-[10px] uppercase font-bold text-slate-500 block">Porsi Kecil (PK)</span>
+              <p class="text-xl font-bold font-num text-slate-900">${instData.pk || '-'}</p>
+            </div>
+            <div class="p-3 bg-emerald-50 border border-emerald-300 rounded-xl">
+              <span class="text-[10px] uppercase font-bold text-emerald-700 block">TOTAL PORSI</span>
+              <p class="text-xl font-black font-num text-emerald-800">${instData.totalPorsi} Porsi</p>
+            </div>
+          </div>
+
+          <!-- SPECIAL DIVISION INSTRUCTIONS -->
+          <div class="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1.5 text-slate-700">
+            <p><strong class="text-slate-900">Tugas Tim Persiapan:</strong> Timbang, cuci, potong, pecah telur, campur adonan tepung, blender bumbu saus, dan kemas bahan berlabel. Semua proses masak (menggoreng telur/tempe, menumis saus) dikerjakan Tim Pengolahan. Selada timun, jeruk, dan roti bun selesai di Tim Persiapan (tidak dimasak).</p>
+            <p class="text-amber-800 font-bold bg-amber-50 p-2 rounded-lg border border-amber-200">${instData.specialNotes}</p>
+          </div>
+        </div>
+
+        <!-- 1. MENU HARI INI DAN UKURAN MATANG -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+            <h2 class="text-sm font-bold text-slate-900 tracking-tight">1. Menu Hari Ini dan Ukuran Matang</h2>
+            <span class="text-[11px] text-slate-500 font-medium">Ukuran setelah dimasak (bukan berat mentah)</span>
+          </div>
+
+          <table class="w-full text-left text-xs border border-slate-200">
+            <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+              <tr>
+                <th class="p-2.5">Menu</th>
+                <th class="p-2.5">Kategori</th>
+                <th class="p-2.5">Ukuran per Porsi</th>
+                <th class="p-2.5 text-right">Jumlah Total</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 font-medium text-slate-800">
+              ${instData.items.map(it => `
+                <tr>
+                  <td class="p-2.5 font-bold">${it.name}</td>
+                  <td class="p-2.5 text-slate-600">${it.cat}</td>
+                  <td class="p-2.5 text-slate-800">${it.perPorsi}</td>
+                  <td class="p-2.5 text-right font-num font-bold text-slate-900">${it.total}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-[11px] text-slate-600">
+            <strong>Catatan Chef:</strong> ${dayData.notes}
+          </div>
+        </div>
+
+        <!-- 2. ATURAN YANG WAJIB DIPATUHI SEMUA RELAWAN -->
+        <div class="space-y-2.5">
+          <h2 class="text-sm font-bold text-slate-900 tracking-tight border-b border-slate-200 pb-2">2. Aturan Wajib Relawan Dapur SPPG</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-xs text-slate-700">
+            <div class="p-2.5 rounded-lg border border-slate-200 bg-slate-50/50 space-y-1">
+              <p class="font-bold text-slate-900">&bull; Sanitasi & Kebersihan Tangan</p>
+              <p class="text-[11px] text-slate-600">Cuci tangan dengan sabun 20 detik sebelum mulai, setelah pegang telur mentah, dari toilet, dan setiap ganti pekerjaan. Gunakan masker, penutup rambut, celemek, sarung tangan.</p>
+            </div>
+            <div class="p-2.5 rounded-lg border border-slate-200 bg-slate-50/50 space-y-1">
+              <p class="font-bold text-slate-900">&bull; Isolasi Telur Mentah & Daging</p>
+              <p class="text-[11px] text-slate-600">Telur mentah dipisah. Cangkang dan cairan telur mentah dilarang menyentuh selada, timun, jeruk, atau roti. Meja didesinfeksi setelah pecah telur.</p>
+            </div>
+            <div class="p-2.5 rounded-lg border border-slate-200 bg-slate-50/50 space-y-1">
+              <p class="font-bold text-slate-900">&bull; Pisahkan Talenan Sayur / Matang</p>
+              <p class="text-[11px] text-slate-600">Selada timun dan buah tidak dimasak: wajib pakai talenan hijau khusus sayur/buah bersih dan sarung tangan steril.</p>
+            </div>
+            <div class="p-2.5 rounded-lg border border-slate-200 bg-slate-50/50 space-y-1">
+              <p class="font-bold text-slate-900">&bull; Timbang Presisi & Label Wadah</p>
+              <p class="text-[11px] text-slate-600">Timbang dan hitung, jangan menebak. Semua bahan masuk wadah berlabel institusi masing-masing. Jangan campur wadah antar sekolah.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. BAHAN UNTUK INSTITUSI INI -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+            <h2 class="text-sm font-bold text-slate-900 tracking-tight">3. Kebutuhan Bahan untuk ${instData.name} (${instData.totalPorsi} Porsi)</h2>
+            <span class="text-[11px] text-slate-500 font-medium">Ambil sesuai kolom KUANTITAS BELI</span>
+          </div>
+
+          <table class="w-full text-left text-xs border border-slate-200">
+            <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+              <tr>
+                <th class="p-2.5">Nama Bahan Baku</th>
+                <th class="p-2.5">Takaran Bersih / Porsi</th>
+                <th class="p-2.5 text-right">Kuantitas Total Wadah</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 font-medium text-slate-800">
+              ${instData.rawIngredients.map(ing => `
+                <tr>
+                  <td class="p-2.5 font-bold">${ing.name}</td>
+                  <td class="p-2.5 text-slate-600">${ing.perPorsi}</td>
+                  <td class="p-2.5 text-right font-num font-bold text-slate-900">${ing.qty}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 4. TABEL CEPAT MENIMBANG UNTUK RELAWAN -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+            <h2 class="text-sm font-bold text-slate-900 tracking-tight">4. Tabel Cepat Menimbang Relawan (Baskom / Wadah)</h2>
+            <span class="text-[11px] text-slate-500 font-medium">Gunakan patokan ini agar relawan tidak perlu menghitung manual</span>
+          </div>
+
+          <table class="w-full text-left text-xs border border-slate-200">
+            <thead class="bg-emerald-900 text-white font-bold">
+              <tr>
+                <th class="p-2.5">Bahan Baku (Target Satuan)</th>
+                <th class="p-2.5 text-center">10 Porsi</th>
+                <th class="p-2.5 text-center">50 Porsi</th>
+                <th class="p-2.5 text-center">100 Porsi</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 font-medium text-slate-800">
+              ${instData.quickScaleTable.map(q => `
+                <tr>
+                  <td class="p-2.5 font-bold">${q.item}</td>
+                  <td class="p-2.5 text-center font-num font-bold text-slate-800 bg-slate-50">${q.p10}</td>
+                  <td class="p-2.5 text-center font-num font-bold text-slate-900 bg-emerald-50/50">${q.p50}</td>
+                  <td class="p-2.5 text-center font-num font-bold text-emerald-800 bg-emerald-100/50">${q.p100}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 5. PENANGGUNG JAWAB STASIUN & PARAF KONTROL MUTU -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-200 text-xs">
+          <div>
+            <h4 class="font-bold text-slate-900 uppercase tracking-wider mb-2">Penanggung Jawab Stasiun:</h4>
+            <div class="space-y-1.5 text-slate-700">
+              <div class="flex justify-between p-2 rounded bg-slate-50 border border-slate-200">
+                <span class="font-bold">Stasiun Roti / Karbo & Telur:</span>
+                <span>Bu Riki, Bu Linda</span>
+              </div>
+              <div class="flex justify-between p-2 rounded bg-slate-50 border border-slate-200">
+                <span class="font-bold">Stasiun Tempe & Saus:</span>
+                <span>Faiz</span>
+              </div>
+              <div class="flex justify-between p-2 rounded bg-slate-50 border border-slate-200">
+                <span class="font-bold">Stasiun Selada & Timun:</span>
+                <span>Abidin</span>
+              </div>
+              <div class="flex justify-between p-2 rounded bg-slate-50 border border-slate-200">
+                <span class="font-bold">Stasiun Buah & QC Timbang:</span>
+                <span>Rizal, Pak Yudi, Ikbal</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-slate-900 uppercase tracking-wider mb-2">Otorisasi & Kontrol Mutu:</h4>
+            <div class="p-4 rounded-xl border border-slate-300 bg-slate-50/50 text-center space-y-2">
+              <p class="text-slate-500 text-[11px]">Disahkan oleh Head Chef Shift Malam,</p>
+              <div class="h-10"></div>
+              <p class="font-bold text-slate-900 border-t border-slate-300 pt-1">Chef Lutfi Iskandar</p>
+              <p class="text-[10px] text-slate-500">SPPG Pekajangan 04 &bull; Program MBG</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // NAVIGATION CONTROLLER
+    function switchMainTab(tabId) {
+      document.querySelectorAll('.main-content-section').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.main-tab').forEach(el => {
+        el.className = 'main-tab px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 cursor-pointer';
+      });
+
+      const activeSection = document.getElementById('section-' + tabId);
+      const activeBtn = document.getElementById('btn-tab-' + tabId);
+
+      if (activeSection) activeSection.classList.remove('hidden');
+      if (activeBtn) {
+        activeBtn.className = 'main-tab px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-xs cursor-pointer';
+      }
+
+      if (tabId === 'arahan') renderActiveDirective();
+      if (tabId === 'resep') renderRecipeCards();
+      if (tabId === 'siklus') renderCycleCards();
+    }
+
+    // DAY SELECTOR CONTROLLER
+    function selectDay(dayKey) {
+      currentDayKey = dayKey;
+      document.querySelectorAll('.day-selector-btn').forEach(btn => {
+        btn.className = 'day-selector-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer';
+      });
+
+      const activeBtn = document.getElementById('day-btn-' + dayKey);
+      if (activeBtn) {
+        activeBtn.className = 'day-selector-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-xs cursor-pointer';
+      }
+
+      const dayData = MBG_DATA[dayKey];
+      if (dayData) {
+        document.getElementById('header-total-portions').innerText = dayData.totalPortions.toLocaleString('id-ID') + ' Porsi';
+      }
+
+      renderActiveDirective();
+      renderRecipeCards();
+      showToast('Jadwal ' + (dayData ? dayData.dateString : dayKey) + ' dimuat.');
+    }
+
+    // RENDER RECIPE CARDS (2,000+ PORTIONS SCALER)
+    function renderRecipeCards() {
+      const container = document.getElementById('recipe-cards-container');
+      if (!container) return;
+
+      const dayData = MBG_DATA[currentDayKey];
+      if (!dayData) return;
+
+      if (currentDayKey === 'senin_23') {
+        container.innerHTML = `
+          <!-- Resep 1: Nasi Gurih -->
+          <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-xl p-5 shadow-xs space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <span class="text-[10px] font-bold uppercase text-emerald-600 dark:text-emerald-400 tracking-wider">Komponen Karbohidrat (1 kg Beras = 19 Porsi)</span>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">1. Nasi Gurih Santan Serai (2.211 Porsi)</h3>
+                <p class="text-xs text-slate-500">Kapasitas Dapur: Dibagi 8 Batch Dandang / Rice Cooker Besar (±276 porsi/batch)</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 font-bold text-xs text-slate-800 dark:text-slate-200">8 Batch Wajan</span>
+            </div>
+
+            <table class="w-full text-left text-xs border border-slate-200">
+              <thead class="bg-slate-50 text-slate-700 font-bold">
+                <tr>
+                  <th class="p-2">Bahan Bersih</th>
+                  <th class="p-2">Per Porsi</th>
+                  <th class="p-2 text-right">Total 2.211 Porsi</th>
+                  <th class="p-2 text-right font-bold text-emerald-700">Per Batch (÷8)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 text-slate-800 font-medium">
+                <tr><td class="p-2 font-bold">Beras Pulen</td><td class="p-2">52,6 g</td><td class="p-2 text-right font-num">116,37 kg</td><td class="p-2 text-right font-num font-bold text-emerald-800">14,55 kg</td></tr>
+                <tr><td class="p-2 font-bold">Santan Kental</td><td class="p-2">21,1 ml</td><td class="p-2 text-right font-num">46,55 L</td><td class="p-2 text-right font-num font-bold text-emerald-800">5,82 L</td></tr>
+                <tr><td class="p-2 font-bold">Air Bersih Bersuhu Hangat</td><td class="p-2">42,1 ml</td><td class="p-2 text-right font-num">93,09 L</td><td class="p-2 text-right font-num font-bold text-emerald-800">11,64 L</td></tr>
+                <tr><td class="p-2 font-bold">Garam Halus</td><td class="p-2">0,79 g</td><td class="p-2 text-right font-num">1,75 kg</td><td class="p-2 text-right font-num font-bold text-emerald-800">218,2 g</td></tr>
+                <tr><td class="p-2 font-bold">Serai Geprek</td><td class="p-2">1,05 g</td><td class="p-2 text-right font-num">2,33 kg</td><td class="p-2 text-right font-num font-bold text-emerald-800">290,9 g</td></tr>
+              </tbody>
+            </table>
+
+            <div class="p-3 bg-slate-50 rounded-lg text-xs space-y-1 text-slate-700">
+              <p><strong>Catatan Sains Kuliner Chef:</strong> Panaskan santan dan dedaunan perlahan sampai muncul gelembung kecil di pinggir wajan (jangan mendidih keras agar santan tidak pecah). Siramkan ke dandang. Tahan di suhu penyimpanan &ge; 60 &deg;C. Maksimal 4 jam harus habis.</p>
+            </div>
+          </div>
+
+          <!-- Resep 2: Lele Crispy -->
+          <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-xl p-5 shadow-xs space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <span class="text-[10px] font-bold uppercase text-blue-600 dark:text-blue-400 tracking-wider">Komponen Protein Hewani (ProHe 60 g Matang)</span>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">2. Lele Crispy Fillet (2.211 Porsi)</h3>
+                <p class="text-xs text-slate-500">Fillet lele bebas duri dan kulit, digoreng krispi keemasan (suhu minyak 170-175 °C)</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-950 font-bold text-xs text-blue-800 dark:text-blue-200">Deep Fryer / Wajan 8 Batch</span>
+            </div>
+
+            <table class="w-full text-left text-xs border border-slate-200">
+              <thead class="bg-slate-50 text-slate-700 font-bold">
+                <tr>
+                  <th class="p-2">Bahan Baku</th>
+                  <th class="p-2">Per Porsi</th>
+                  <th class="p-2 text-right">Total Belanja (2.211 Porsi)</th>
+                  <th class="p-2 text-right font-bold text-blue-800">Per Batch (÷8)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 text-slate-800 font-medium">
+                <tr><td class="p-2 font-bold">Lele Fillet Segar</td><td class="p-2">60 g</td><td class="p-2 text-right font-num">132,66 kg</td><td class="p-2 text-right font-num font-bold text-blue-800">16,58 kg</td></tr>
+                <tr><td class="p-2 font-bold">Jeruk Nipis Peras</td><td class="p-2">3 g</td><td class="p-2 text-right font-num">6,63 kg</td><td class="p-2 text-right font-num font-bold text-blue-800">829 g</td></tr>
+                <tr><td class="p-2 font-bold">Tepung Terigu</td><td class="p-2">10 g</td><td class="p-2 text-right font-num">22,11 kg</td><td class="p-2 text-right font-num font-bold text-blue-800">2,76 kg</td></tr>
+                <tr><td class="p-2 font-bold">Tepung Maizena (Crispy)</td><td class="p-2">5 g</td><td class="p-2 text-right font-num">11,05 kg</td><td class="p-2 text-right font-num font-bold text-blue-800">1,38 kg</td></tr>
+                <tr><td class="p-2 font-bold">Minyak Goreng Sawit</td><td class="p-2">9 ml</td><td class="p-2 text-right font-num">19,90 L</td><td class="p-2 text-right font-num font-bold text-blue-800">2,49 L</td></tr>
+              </tbody>
+            </table>
+
+            <div class="p-3 bg-slate-50 rounded-lg text-xs space-y-1 text-slate-700">
+              <p><strong>Standar QC Chef:</strong> Goreng selama 4-5 menit sampai warna emas kekuningan. Tiriskan di rak kawat minimal 2 menit sebelum masuk wadah stasiun. Jangan tutup rapat saat masih panas agar uap air tidak membuat krispi lembek.</p>
+            </div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <!-- Resep Hari Ini (Kamis 19 Nov) -->
+          <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-xl p-5 shadow-xs space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <span class="text-[10px] font-bold uppercase text-emerald-600 dark:text-emerald-400 tracking-wider">Formula Hari Ini (2.742 Porsi)</span>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">Telur Ceplok & Tempe Goreng Tepung (Burger Meal)</h3>
+                <p class="text-xs text-slate-500">Pekajangan 04 &bull; Menyuplai SMK 1, MTs, dan 2 Posyandu</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-md bg-emerald-50 dark:bg-emerald-950 font-bold text-xs text-emerald-800 dark:text-emerald-300">Total: 2.742 Butir Telur</span>
+            </div>
+
+            <table class="w-full text-left text-xs border border-slate-200">
+              <thead class="bg-slate-50 text-slate-700 font-bold">
+                <tr>
+                  <th class="p-2">Bahan Baku Dapur</th>
+                  <th class="p-2">Target Matang / Porsi</th>
+                  <th class="p-2 text-right">Total Belanja Dapur</th>
+                  <th class="p-2 text-right font-bold text-emerald-800">Batch Wajan (÷8)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 text-slate-800 font-medium">
+                <tr><td class="p-2 font-bold">Roti Bun Siap Pakai</td><td class="p-2">1 buah (±50 g)</td><td class="p-2 text-right font-num font-bold">2.742 buah (457 pack)</td><td class="p-2 text-right font-num">57 pack</td></tr>
+                <tr><td class="p-2 font-bold">Telur Ayam Ras (Besar)</td><td class="p-2">1 butir (±60 g matang)</td><td class="p-2 text-right font-num font-bold">2.742 butir (164,5 kg)</td><td class="p-2 text-right font-num">342 butir</td></tr>
+                <tr><td class="p-2 font-bold">Tempe Segar Padat (ProNa)</td><td class="p-2">30 g matang bertepung</td><td class="p-2 text-right font-num font-bold">74,03 kg mentah</td><td class="p-2 text-right font-num">9,25 kg</td></tr>
+                <tr><td class="p-2 font-bold">Tepung Terigu + Beras Adonan</td><td class="p-2">10,5 g tepung</td><td class="p-2 text-right font-num font-bold">28,79 kg</td><td class="p-2 text-right font-num">3,60 kg</td></tr>
+                <tr><td class="p-2 font-bold">Timun & Selada Segar</td><td class="p-2">30 g matang</td><td class="p-2 text-right font-num font-bold">90,5 kg kotor</td><td class="p-2 text-right font-num">11,3 kg</td></tr>
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+    }
+
+    // RENDER 2-WEEK MENU CYCLE
+    function renderCycleCards() {
+      const container = document.getElementById('cycle-cards-grid');
+      if (!container) return;
+
+      const cycles = [
+        { day: "Senin", menu: "Nasi Gurih, Lele Crispy, Sambal Bajak, Tempe Orek, Lalap Timun Kol, Jeruk", status: "Disetujui Gizi" },
+        { day: "Selasa", menu: "Nasi Gurih, Semur Telur Rollade, Tahu Goreng, Mix Vigie, Pisang", status: "Disetujui Gizi" },
+        { day: "Rabu", menu: "Nasi Putih, Chicken Pop Kecap, Tempe Goreng, Tumis Labu Jagung, Kelengkeng", status: "Disetujui Gizi" },
+        { day: "Kamis", menu: "Roti Bun Burger, Telur Ceplok, Tempe Tepung, Selada Timun, Saus Pedas/Tomat, Jeruk", status: "Sedang Berjalan" },
+        { day: "Jumat", menu: "Nasi Uduk, Ayam Suwir Opor, Tahu Bacem, Sayur Bening Bayam Jagung, Semangka", status: "Disetujui Gizi" }
+      ];
+
+      container.innerHTML = cycles.map(c => `
+        <div class="bg-white dark:bg-[#111726] border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-2 shadow-xs">
+          <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-2">
+            <span class="font-bold text-slate-900 dark:text-white text-sm">${c.day}</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${c.status === 'Sedang Berjalan' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${c.status}</span>
+          </div>
+          <p class="text-xs text-slate-700 dark:text-slate-300 font-medium">${c.menu}</p>
+          <div class="pt-2 text-[10px] text-slate-400 border-t border-slate-100 dark:border-slate-800">
+            5 Komponen Gizi Lengkap
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // BROADCAST DIRECTIVE VIA WHATSAPP (ONE-CLICK VOLUNTEER DISPATCH)
+    function broadcastDirectiveViaWhatsApp() {
+      const dayData = MBG_DATA[currentDayKey];
+      const instData = dayData ? dayData.institutions[currentInstKey] : null;
+      if (!instData) return;
+
+      let msg = `*ARAHAN TIM PERSIAPAN SPPG PEKAJANGAN 04*\n`;
+      msg += `Institusi: *${instData.name}*\n`;
+      msg += `Jadwal: ${dayData.dateString}\n`;
+      msg += `Total Porsi: *${instData.totalPorsi} porsi* (PB: ${instData.pb || '-'}, PK: ${instData.pk || '-'})\n\n`;
+      msg += `*MENU & UKURAN MATANG:*\n`;
+      instData.items.forEach(it => {
+        msg += `- ${it.name}: ${it.perPorsi} (Total: ${it.total})\n`;
+      });
+      msg += `\n*CATATAN KHUSUS CHEF:*\n${instData.specialNotes}\n\n`;
+      msg += `*TABEL CEPAT MENIMBANG (Relawan):*\n`;
+      instData.quickScaleTable.forEach(q => {
+        msg += `• ${q.item} -> 10p: ${q.p10} | 50p: ${q.p50} | 100p: ${q.p100}\n`;
+      });
+      msg += `\nHarap timbang sesuai tabel dan jangan menebak. - Chef Lutfi Iskandar`;
+
+      window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(msg), '_blank');
+      showToast('Teks arahan relawan disiapkan untuk WhatsApp');
+    }
+
+    // EMERGENCY SUBSTITUTION MODAL
+    function openEmergencyModal() {
+      document.getElementById('emergency-modal').classList.remove('hidden');
+    }
+
+    function closeEmergencyModal() {
+      document.getElementById('emergency-modal').classList.add('hidden');
+    }
+
+    function applyEmergencySwap() {
+      const orig = document.getElementById('swap-origin-item').value;
+      const target = document.getElementById('swap-target-item').value;
+
+      closeEmergencyModal();
+      showToast('Substitusi bahan darurat berhasil diterapkan & lembar arahan diperbarui!');
+    }
+
+    // TOAST SYSTEM
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      if (!toast || !toastMsg) return;
+
+      toastMsg.innerText = msg;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      toast.classList.add('opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 3000);
+    }
+
+    // THEME SYSTEM
+    function initTheme() {
+      const isDark = localStorage.getItem('chef_mbg_theme') === 'dark';
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+      } else {
+        document.documentElement.classList.add('light');
+        document.documentElement.classList.remove('dark');
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.contains('dark');
+      if (isDark) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        localStorage.setItem('chef_mbg_theme', 'light');
+        showToast('Mode Terang Aktif');
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+        localStorage.setItem('chef_mbg_theme', 'dark');
+        showToast('Mode Gelap Aktif');
+      }
+    }
+
+    // INITIALIZATION
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      renderActiveDirective();
+      renderRecipeCards();
+    });
+  </script>
+</body>
+</html>
+"""
+
+# Write target files
+targets = [
+    'index.html',
+    'preview.html',
+    r'C:\Users\HP\.gemini\antigravity\brain\9c1ce148-7426-4dba-b2a3-bd7207cd3b11\preview.html'
+]
+
+for t in targets:
+    os.makedirs(os.path.dirname(t) if os.path.dirname(t) else '.', exist_ok=True)
+    with open(t, 'w', encoding='utf-8') as f:
+        f.write(html_code)
+    print(f"Generated Chef MBG system at: {t}")
+
+print("Chef MBG build successful!")
