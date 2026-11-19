@@ -858,28 +858,319 @@
       showToast('Jadwal ' + (dayData ? dayData.dateString : dayKey) + ' dimuat.');
     }
 
-    // RENDER RECIPE CARDS (2,000+ PORTIONS SCALER - SIKLUS 30 NOV - 11 DES 2026)
+    // 10-DAY MASTER RECIPES DATASET (SIKLUS 30 NOV - 11 DES 2026)
+    const MASTER_RECIPES = {
+      senin_30: {
+        title: "Senin, 30 November 2026 (2.442 Porsi)",
+        subtitle: "Ayam Dadu Tepung Saus Mentega Madu, Tahu Bacem Legit, Tumis Labu Wortel, Buah Naga",
+        totalPorsi: "2.442 Porsi",
+        batchCount: "8 Batch Wajan",
+        prohe: {
+          name: "1. Ayam Dadu Tepung Saus Mentega Madu (ProHe - Target 45g Matang)",
+          desc: "Fillet ayam dadu 2 cm dimarinasi wijen bawang putih jahe, digoreng krispi keemasan dan diglaze saus mentega madu tanpa cabai.",
+          items: [
+            { name: "Fillet Daging Ayam Bersih", perPorsi: "40 g mentah", po: "95,0 kg", batch: "11,88 kg" },
+            { name: "Bumbu Marinasi (Bawang Putih, Jahe, Wijen)", perPorsi: "1,5 g", po: "3,65 kg", batch: "456 g" },
+            { name: "Tepung Terigu + Maizena (Rasio 3:1)", perPorsi: "13 g", po: "32,0 kg", batch: "4,00 kg" },
+            { name: "Telur Ayam Pencelup (Egg Wash)", perPorsi: "4 g", po: "10,0 kg (160 butir)", batch: "1,25 kg (20 btr)" },
+            { name: "Mentega / Margarin Saus Glaze", perPorsi: "5 g", po: "12,0 kg", batch: "1,50 kg" },
+            { name: "Madu Murni Glaze", perPorsi: "3 g", po: "7,5 kg", batch: "938 g" },
+            { name: "Kecap Manis + Saus Tiram + Bombay", perPorsi: "9 g", po: "22,5 kg", batch: "2,81 kg" }
+          ],
+          chefNotes: "Dadu ayam digoreng pada suhu minyak 175 °C selama 5 menit sampai keemasan, tiriskan di rak kawat minimal 2 menit. Saus mentega madu ditumis di wajan terpisah sampai mengental mengkilap, lalu ayam diaduk kilat (tossed) sesaat sebelum packing agar kerenyahannya bertahan 4 jam."
+        },
+        prona: {
+          name: "2. Tahu Bacem Tradisional Air Kelapa (ProNa - Target 35g Matang)",
+          desc: "Tahu putih padat diungkep air kelapa murni dan gula merah kelapa sampai bumbu meresap hitam karamel legit.",
+          items: [
+            { name: "Tahu Putih Segar Padat", perPorsi: "1 potong (40 g)", po: "2.450 potong (98 kg)", batch: "306 potong (12,25 kg)" },
+            { name: "Air Kelapa Murni Alami", perPorsi: "14 ml", po: "35,0 L", batch: "4,38 L" },
+            { name: "Gula Merah Kelapa Sisir", perPorsi: "4,5 g", po: "11,0 kg", batch: "1,38 kg" },
+            { name: "Bumbu Rempah (Ketumbar, Bawang, Lengkuas, Salam, Asam)", perPorsi: "3,5 g", po: "8,5 kg", batch: "1,06 kg" }
+          ],
+          chefNotes: "Ungkep api kecil sampai air kelapa dan gula merah susut pekat. Goreng kilat (flash fry) 1 menit sebelum disajikan agar berkulit mengkilap cantik."
+        }
+      },
+      selasa_01: {
+        title: "Selasa, 01 Desember 2026 (2.442 Porsi)",
+        subtitle: "Sosis Telur Grill Saus Teriyaki, Tempe Goreng Kuning, Mix Vegetable Mentega, Anggur",
+        totalPorsi: "2.442 Porsi",
+        batchCount: "8 Batch Wajan",
+        prohe: {
+          name: "1. Sosis Telur Grill Saus Teriyaki (ProHe)",
+          desc: "Sosis sapi iris spiral dipadu telur dadar tebal grill dengan olesan saus teriyaki gurih manis beraroma jahe bombay karamel.",
+          items: [
+            { name: "Sosis Sapi Premium (Iris Spiral)", perPorsi: "45 g", po: "110,0 kg (2.450 pcs)", batch: "13,75 kg" },
+            { name: "Telur Ayam Ras (Dadar Grill)", perPorsi: "30 g", po: "75,0 kg (1.200 butir)", batch: "9,38 kg" },
+            { name: "Saus Teriyaki Jepang", perPorsi: "6,5 g", po: "16,0 kg", batch: "2,00 kg" },
+            { name: "Bawang Bombay + Bawang Putih Cincang", perPorsi: "6 g", po: "14,5 kg", batch: "1,81 kg" },
+            { name: "Saus Tiram + Kecap Manis + Wijen", perPorsi: "4,5 g", po: "11,5 kg", batch: "1,44 kg" }
+          ],
+          chefNotes: "Gunakan wajan datar besar berpanas sedang. Tumis sosis hingga merekah lalu siram saus teriyaki sampai saus membalut mengkilap (glazing)."
+        },
+        prona: {
+          name: "2. Tempe Goreng Bumbu Kuning (ProNa - Target 30g Matang)",
+          desc: "Tempe kedelai murni diungkep bumbu kunyit ketumbar dan digoreng garing renyah.",
+          items: [
+            { name: "Tempe Kedelai Murni", perPorsi: "35 g mentah", po: "80,0 kg (2.450 pcs)", batch: "10,0 kg" },
+            { name: "Bumbu Halus Kunyit Ketumbar Bawang Garam", perPorsi: "2,5 g", po: "6,0 kg", batch: "750 g" },
+            { name: "Minyak Goreng Sawit", perPorsi: "10 ml", po: "25,0 L", batch: "3,12 L" }
+          ],
+          chefNotes: "Pastikan minyak mencapai 170 °C sebelum tempe dimasukkan agar tempe matang renyah dan tidak menyerap minyak berlebih."
+        }
+      },
+      rabu_02: {
+        title: "Rabu, 02 Desember 2026 (2.442 Porsi)",
+        subtitle: "Ayam Goreng Lengkuas Rempah, Sambal Bawang Dapur (PK Saus Gurih), Tahu Dadu Tepung, Tumis Sawi Wortel, Jeruk",
+        totalPorsi: "2.442 Porsi",
+        batchCount: "8 Batch Wajan",
+        prohe: {
+          name: "1. Ayam Goreng Lengkuas Rempah Krispi (ProHe - Target 50g Matang)",
+          desc: "Daging ayam diungkep bumbu rempah kuning lengkuas parut, digoreng gurih keemasan dan ditaburi serundeng lengkuas krispi.",
+          items: [
+            { name: "Daging Ayam Karkas Potong", perPorsi: "60 g kotor", po: "145,0 kg (2.450 pcs)", batch: "18,12 kg" },
+            { name: "Lengkuas Parut Kasar (Serundeng)", perPorsi: "6 g", po: "15,0 kg", batch: "1,88 kg" },
+            { name: "Bumbu Kuning Lengkap (Bawang, Kunyit, Jahe, Serai, Salam)", perPorsi: "5 g", po: "12,0 kg", batch: "1,50 kg" },
+            { name: "Garam Halus + Kaldu Ayam", perPorsi: "1,5 g", po: "3,9 kg", batch: "488 g" }
+          ],
+          chefNotes: "Ungkep ayam hingga empuk dan air menyusut. Tiriskan ayam dan peras sedikit ampas lengkuas. Goreng ampas lengkuas dengan saringan minyak agar serundeng renyah kering tidak gosong."
+        },
+        prona: {
+          name: "2. Tahu Dadu Tepung Gurih (ProNa)",
+          desc: "Tahu putih dadu 1,5 cm dibalut tepung beras bumbu bawang putih dan digoreng krispi.",
+          items: [
+            { name: "Tahu Putih Dadu 1,5 cm", perPorsi: "35 g", po: "90,0 kg", batch: "11,25 kg" },
+            { name: "Tepung Terigu + Tepung Beras", perPorsi: "10 g", po: "25,0 kg", batch: "3,12 kg" },
+            { name: "Bumbu Bawang Putih Garam Kaldu", perPorsi: "1,6 g", po: "4,0 kg", batch: "500 g" }
+          ],
+          chefNotes: "Goreng dalam minyak banyak dan panas agar tahu berkulit renyah dan bagian dalamnya tetap lembut juicy."
+        }
+      },
+      kamis_03: {
+        title: "Kamis, 03 Desember 2026 (2.442 Porsi)",
+        subtitle: "Roti Bun Burger, Telor Ceplok Utuh 74°C, Tempe Tepung Daun Bawang, Saus Pedas/Tomat, Timun Selada, Kelengkeng",
+        totalPorsi: "2.442 Porsi",
+        batchCount: "8 Batch Wajan",
+        prohe: {
+          name: "1. Telur Ceplok Utuh Matang Sempurna (ProHe - Standar HACCP)",
+          desc: "Telur ayam ras segar diceplok matang sempurna pada wajan datar bersekat, suhu inti mencapai ≥ 74 °C bebas Salmonella.",
+          items: [
+            { name: "Telur Ayam Ras Besar (55-60 g)", perPorsi: "1 butir", po: "2.453 butir (147,2 kg)", batch: "306 butir" },
+            { name: "Minyak Oles Wajan Datar", perPorsi: "3 ml", po: "8,0 L", batch: "1,0 L" },
+            { name: "Garam Halus Tabur", perPorsi: "0,2 g", po: "500 g", batch: "62 g" }
+          ],
+          chefNotes: "Tutup wajan datar saat menggoreng ceplok agar bagian atas kuning telur matang sempurna terkena uap panas tanpa perlu dibalik hancur."
+        },
+        prona: {
+          name: "2. Tempe Goreng Tepung Daun Bawang (ProNa)",
+          desc: "Tempe kedelai berbalut adonan tepung beras renyah dengan aroma harum irisan daun bawang segar.",
+          items: [
+            { name: "Tempe Kedelai Iris", perPorsi: "25 g mentah", po: "55,0 kg", batch: "6,88 kg" },
+            { name: "Tepung Terigu + Tepung Beras", perPorsi: "10 g", po: "24,0 kg", batch: "3,00 kg" },
+            { name: "Daun Bawang Iris Halus", perPorsi: "1,6 g", po: "4,0 kg", batch: "500 g" },
+            { name: "Bumbu Ketumbar Bawang Garam", perPorsi: "1,6 g", po: "4,0 kg", batch: "500 g" }
+          ],
+          chefNotes: "Gunakan adonan dengan kekentalan sedang. Goreng sampai pinggirannya krispi bersarang."
+        }
+      },
+      jumat_04: {
+        title: "Jumat, 04 Desember 2026 (2.094 Porsi)",
+        subtitle: "Kimbab Roll Sushi Nasi Gurih, Karage Ayam Juicy Saus Bulgogi, Edamame Rebus Polong, Pisang",
+        totalPorsi: "2.094 Porsi",
+        batchCount: "8 Batch Wajan",
+        prohe: {
+          name: "1. Karage Ayam Juicy Saus Bulgogi (ProHe)",
+          desc: "Potongan paha ayam dadu dimarinasi shoyu jahe bawang putih, dibalut tepung tapioka karage renyah dengan siraman saus bulgogi.",
+          items: [
+            { name: "Fillet Paha Ayam Juicy (Dadu 2,5 cm)", perPorsi: "40 g mentah", po: "85,0 kg", batch: "10,63 kg" },
+            { name: "Bumbu Marinasi Shoyu Jahe Bawang Wijen", perPorsi: "3,3 g", po: "7,0 kg", batch: "875 g" },
+            { name: "Tepung Tapioka / Maizena Karage", perPorsi: "8,5 g", po: "18,0 kg", batch: "2,25 kg" },
+            { name: "Saus Bulgogi Glaze (Pir, Kecap Asin, Wijen)", perPorsi: "10 g", po: "21,0 kg", batch: "2,63 kg" }
+          ],
+          chefNotes: "Tepung tapioka menghasilkan kerenyahan khas karage yang tipis dan garing tanpa menyerap banyak saus sehingga ayam tetap renyah saat dinikmati siswa."
+        },
+        prona: {
+          name: "2. Edamame Rebus Polong Gurih (ProNa)",
+          desc: "Edamame polong hijau segar direbus air garam laut, manis alami dan kaya serat nabati.",
+          items: [
+            { name: "Edamame Polong Segar", perPorsi: "35 g", po: "75,0 kg", batch: "9,38 kg" },
+            { name: "Garam Rebus Laut", perPorsi: "1,2 g", po: "2,5 kg", batch: "312 g" }
+          ],
+          chefNotes: "Rebus tepat 5 menit pada air mendidih. Langsung tiriskan dan angin-anginkan agar warna polong tetap hijau cerah mengkilap."
+        }
+      },
+      senin_07: {
+        title: "Senin, 07 Desember 2026 (2.442 Porsi)",
+        subtitle: "Nasi Putih, Ayam Katsu Panko Renyah, Sambal Ijo Padang, Tempe Goreng, Lalap Timun Kol, Pisang",
+        totalPorsi: "2.442 Porsi",
+        batchCount: "8 Batch Wajan",
+        prohe: {
+          name: "1. Ayam Katsu Panko Renyah (ProHe - Target 50g Matang)",
+          desc: "Fillet dada ayam pipih dimarinasi gurih, dibalut tepung roti panko kasar tiga tahap, digoreng renyah keemasan.",
+          items: [
+            { name: "Fillet Dada Ayam Bersih (Tebal 1 cm)", perPorsi: "40 g mentah", po: "95,0 kg", batch: "11,88 kg" },
+            { name: "Bumbu Marinasi Bawang Putih Kecap Asin Lada", perPorsi: "1,6 g", po: "4,0 kg", batch: "500 g" },
+            { name: "Tepung Terigu Pro Sedang (Lapisan 1)", perPorsi: "6 g", po: "15,0 kg", batch: "1,88 kg" },
+            { name: "Telur Ayam Pencelup (Lapisan 2)", perPorsi: "5 g", po: "12,0 kg", batch: "1,50 kg" },
+            { name: "Tepung Roti Panko Kasar (Lapisan 3)", perPorsi: "9 g", po: "22,0 kg", batch: "2,75 kg" }
+          ],
+          chefNotes: "Tekan tepung panko perlahan agar melekat kuat. Goreng 4 menit pada suhu 175 °C. Kerenyahan panko tahan hingga 4 jam dalam kemasan berventilasi."
+        },
+        prona: {
+          name: "2. Tempe Goreng Lengkuas (ProNa)",
+          desc: "Tempe kedelai diungkep bumbu lengkuas dan digoreng garing harum.",
+          items: [
+            { name: "Tempe Kedelai Papan", perPorsi: "35 g", po: "80,0 kg", batch: "10,0 kg" },
+            { name: "Bumbu Lengkuas Bawang Garam Kunyit", perPorsi: "2,5 g", po: "6,0 kg", batch: "750 g" }
+          ],
+          chefNotes: "Goreng tempe dalam minyak banyak dan tiriskan di rak kawat minimal 2 menit."
+        }
+      },
+      selasa_08: {
+        title: "Selasa, 08 Desember 2026 (2.442 Porsi)",
+        subtitle: "Nasi Putih, Telur Katsu Panko Saus BBQ Smokey, Tahu Tepung Dadu, Mix Vigie, Jeruk",
+        totalPorsi: "2.442 Porsi",
+        batchCount: "8 Batch Wajan",
+        prohe: {
+          name: "1. Telur Katsu Panko Saus BBQ Smokey (ProHe)",
+          desc: "Telur rebus matang dibelah dua berbalut tepung panko krispi disiram saus BBQ beraroma asap karamel.",
+          items: [
+            { name: "Telur Ayam Ras (Rebus Belah Dua)", perPorsi: "1 butir", po: "2.453 butir (147,2 kg)", batch: "306 butir" },
+            { name: "Tepung Terigu + Telur Pencelup", perPorsi: "8 g", po: "20,0 kg", batch: "2,50 kg" },
+            { name: "Tepung Roti Panko", perPorsi: "8 g", po: "20,0 kg", batch: "2,50 kg" },
+            { name: "Saus BBQ Smokey Karamel", perPorsi: "10 g", po: "24,0 kg", batch: "3,00 kg" }
+          ],
+          chefNotes: "Goreng kilat 2 menit saja sampai lapisan panko luar renyah keemasan karena telur bagian dalam sudah matang rebus."
+        },
+        prona: {
+          name: "2. Tahu Tepung Dadu Renyah (ProNa)",
+          desc: "Tahu putih dadu berbalut tepung renyah gurih bumbu bawang.",
+          items: [
+            { name: "Tahu Putih Dadu", perPorsi: "35 g", po: "90,0 kg", batch: "11,25 kg" },
+            { name: "Tepung Terigu + Maizena Bumbu", perPorsi: "9 g", po: "22,0 kg", batch: "2,75 kg" }
+          ],
+          chefNotes: "Pastikan tahu ditiriskan airnya sebelum dibalut tepung kering agar adonan tidak menggumpal becek."
+        }
+      },
+      rabu_09: {
+        title: "Rabu, 09 Desember 2026 (2.442 Porsi)",
+        subtitle: "Roti Burger/Sandwich, Patty Ayam Katsu, Mayones Gurih, Edamame Rebus, Coleslaw Salad Mayo, Kelengkeng",
+        totalPorsi: "2.442 Porsi",
+        batchCount: "8 Batch Wajan",
+        prohe: {
+          name: "1. Patty Ayam Katsu Crispy (ProHe)",
+          desc: "Cincangan daging ayam bumbu gurih dibentuk bulat pipih, dibalut tepung panko dan digoreng renyah keemasan.",
+          items: [
+            { name: "Daging Ayam Cincang Bersih", perPorsi: "38 g mentah", po: "90,0 kg", batch: "11,25 kg" },
+            { name: "Bumbu Adonan (Bombay, Tapioka, Telur, Bawang)", perPorsi: "11 g", po: "27,0 kg", batch: "3,38 kg" },
+            { name: "Tepung Panko Pelapis", perPorsi: "8 g", po: "20,0 kg", batch: "2,50 kg" }
+          ],
+          chefNotes: "Kukus atau cetak patty dingin sebelum dibalut panko agar bentuk bulat pipih tetap kokoh dan rapi saat digoreng."
+        },
+        prona: {
+          name: "2. Edamame Rebus Polong Gurih (ProNa)",
+          desc: "Edamame segar rebus polong kaya antioksidan dan serat nabati.",
+          items: [
+            { name: "Edamame Polong Segar", perPorsi: "35 g", po: "85,0 kg", batch: "10,63 kg" },
+            { name: "Garam Rebus Alami", perPorsi: "1,2 g", po: "3,0 kg", batch: "375 g" }
+          ],
+          chefNotes: "Sajikan edamame dalam wadah terpisah agar tidak terkena uap panas roti burger."
+        }
+      },
+      kamis_10: {
+        title: "Kamis, 10 Desember 2026 (2.442 Porsi)",
+        subtitle: "Nasi Putih, Ayam Dadu Kecap Karamel Jahe, Orek Tempe Manis Gurih, Tumis Labu Wortel, Anggur",
+        totalPorsi: "2.442 Porsi",
+        batchCount: "8 Batch Wajan",
+        prohe: {
+          name: "1. Ayam Dadu Kecap Karamel Jahe (ProHe - Target 45g Matang)",
+          desc: "Fillet ayam dadu ditumis bersama kecap manis karamel, bawang bombay, bawang merah, dan aroma jahe geprek pekat lezat.",
+          items: [
+            { name: "Fillet Ayam Bersih Dadu 2 cm", perPorsi: "40 g mentah", po: "95,0 kg", batch: "11,88 kg" },
+            { name: "Kecap Manis Kental Premium", perPorsi: "6 g", po: "14,0 kg", batch: "1,75 kg" },
+            { name: "Jahe Geprek Segar + Bombay + Bawang", perPorsi: "8 g", po: "19,0 kg", batch: "2,38 kg" },
+            { name: "Saus Tiram + Mentega Tumis", perPorsi: "3,8 g", po: "9,0 kg", batch: "1,12 kg" }
+          ],
+          chefNotes: "Tumis bumbu bawang dan jahe sampai layu kecokelatan, masukkan ayam hingga berubah warna, lalu tuang kecap manis di pinggir wajan panas agar terkaramelisasi sempurna."
+        },
+        prona: {
+          name: "2. Orek Tempe Manis Gurih Kering (ProNa)",
+          desc: "Tempe iris korek api digoreng garing kering, dibalut saus gula merah karamel dan cabai merah iris.",
+          items: [
+            { name: "Tempe Kedelai Iris Korek", perPorsi: "30 g mentah", po: "70,0 kg", batch: "8,75 kg" },
+            { name: "Gula Merah Kelapa + Asam Jawa", perPorsi: "4 g", po: "9,5 kg", batch: "1,19 kg" },
+            { name: "Bumbu Salam Lengkuas Cabai Merah", perPorsi: "2,5 g", po: "6,0 kg", batch: "750 g" }
+          ],
+          chefNotes: "Pastikan larutan gula merah sudah berbusa kental (berserabut) sebelum tempe garing dimasukkan. Matikan api dan aduk cepat agar tempe tetap garing tahan berhari-hari."
+        }
+      },
+      jumat_11: {
+        title: "Jumat, 11 Desember 2026 (2.094 Porsi)",
+        subtitle: "Jasuke (Jagung Susu Keju Lumer), Telur Rebus Bulat Utuh 75°C, Kacang Polong Gurih, Puding Wortel Dingin, Buah Naga",
+        totalPorsi: "2.094 Porsi",
+        batchCount: "8 Batch Dandang / Wajan",
+        prohe: {
+          name: "1. Telur Rebus Bulat Utuh Matang 75°C (ProHe - Standar HACCP)",
+          desc: "Telur ayam ras segar utuh direbus air mendidih 11 menit sampai matang sempurna ke pusat kuning telur, direndam air es.",
+          items: [
+            { name: "Telur Ayam Ras Segar", perPorsi: "1 butir", po: "2.105 butir (126,5 kg)", batch: "263 butir" },
+            { name: "Garam Rebus (Mudah Kupas)", perPorsi: "1 g", po: "2,0 kg", batch: "250 g" }
+          ],
+          chefNotes: "Segera pindahkan telur dari air panas ke bak air es mengalir. Perbedaan suhu mendadak memisahkan selaput cangkang sehingga relawan dapat mengupas cangkang dalam hitungan detik tanpa merusak putih telur."
+        },
+        prona: {
+          name: "2. Jasuke Jagung Susu Keju Lumer (Karbohidrat Energi)",
+          desc: "Jagung manis pipil segar dikukus panas matang, diaduk lelehan margarin gurih, kental manis, dan keju cheddar melimpah.",
+          items: [
+            { name: "Jagung Manis Pipil Segar", perPorsi: "75 g", po: "160,0 kg", batch: "20,0 kg" },
+            { name: "Margarin Tawar Mentega", perPorsi: "5 g", po: "10,0 kg", batch: "1,25 kg" },
+            { name: "Susu Kental Manis Putih", perPorsi: "4,5 g", po: "25 kaleng (9,2 kg)", batch: "3 kaleng" },
+            { name: "Keju Cheddar Parut Gurih", perPorsi: "7 g", po: "15,0 kg", batch: "1,88 kg" }
+          ],
+          chefNotes: "Kukus jagung dalam dandang besar bertahap. Aduk margarin dan susu selagi jagung masih mengepul panas agar keju dan mentega meleleh menyatu gurih."
+        }
+      }
+    };
+
+    // RENDER RECIPE CARDS CONTROLLER
     function renderRecipeCards() {
       const container = document.getElementById('recipe-cards-container');
       if (!container) return;
 
       container.innerHTML = `
-        <!-- DAY SELECTOR KHUSUS MASTER RESEP -->
-        <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-2xl shadow-sm space-y-3">
+        <!-- DAY SELECTOR KHUSUS MASTER RESEP LENGKAP 10 HARI -->
+        <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-2xl shadow-sm space-y-3 no-print">
           <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Pilih Formula Resep Harian:</span>
-            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">Skala 2.442 / 2.094 Porsi (÷8 Batch)</span>
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Formula Resep Lengkap Siklus 10 Hari:</span>
+            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">Skala 2.442 / 2.094 Porsi (÷8 Batch)</span>
           </div>
-          <div class="flex items-center gap-2 flex-wrap">
-            <button type="button" onclick="loadRecipeView('senin_30')" id="rcp-btn-senin_30" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-xs cursor-pointer">Senin 30 Nov: Ayam Madu & Tahu Bacem</button>
-            <button type="button" onclick="loadRecipeView('selasa_01')" id="rcp-btn-selasa_01" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Selasa 01 Des: Sosis Telur Teriyaki</button>
-            <button type="button" onclick="loadRecipeView('rabu_02')" id="rcp-btn-rabu_02" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Rabu 02 Des: Ayam Lengkuas Sambal</button>
-            <button type="button" onclick="loadRecipeView('kamis_03')" id="rcp-btn-kamis_03" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Kamis 03 Des: Burger Telur Ceplok</button>
-            <button type="button" onclick="loadRecipeView('jumat_04')" id="rcp-btn-jumat_04" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Jumat 04 Des: Kimbab & Karage Bulgogi</button>
-            <button type="button" onclick="loadRecipeView('jumat_11')" id="rcp-btn-jumat_11" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Jumat 11 Des: Jasuke & Puding Wortel</button>
+
+          <!-- MINGGU 1 BUTTONS -->
+          <div class="space-y-1.5">
+            <span class="text-[10px] font-bold uppercase text-emerald-600 tracking-wider block">Minggu I (30 Nov - 04 Des):</span>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <button type="button" onclick="loadRecipeView('senin_30')" id="rcp-btn-senin_30" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-xs cursor-pointer">Senin 30 Nov: Ayam Madu & Tahu Bacem</button>
+              <button type="button" onclick="loadRecipeView('selasa_01')" id="rcp-btn-selasa_01" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Selasa 01 Des: Sosis Telur Teriyaki</button>
+              <button type="button" onclick="loadRecipeView('rabu_02')" id="rcp-btn-rabu_02" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Rabu 02 Des: Ayam Lengkuas Sambal</button>
+              <button type="button" onclick="loadRecipeView('kamis_03')" id="rcp-btn-kamis_03" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Kamis 03 Des: Burger Telur Ceplok</button>
+              <button type="button" onclick="loadRecipeView('jumat_04')" id="rcp-btn-jumat_04" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Jumat 04 Des: Kimbab & Karage Bulgogi</button>
+            </div>
+          </div>
+
+          <!-- MINGGU 2 BUTTONS -->
+          <div class="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <span class="text-[10px] font-bold uppercase text-blue-600 tracking-wider block">Minggu II (07 - 11 Des):</span>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <button type="button" onclick="loadRecipeView('senin_07')" id="rcp-btn-senin_07" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Senin 07 Des: Ayam Katsu Sambal Ijo</button>
+              <button type="button" onclick="loadRecipeView('selasa_08')" id="rcp-btn-selasa_08" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Selasa 08 Des: Telur Katsu BBQ</button>
+              <button type="button" onclick="loadRecipeView('rabu_09')" id="rcp-btn-rabu_09" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Rabu 09 Des: Patty Katsu & Coleslaw</button>
+              <button type="button" onclick="loadRecipeView('kamis_10')" id="rcp-btn-kamis_10" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Kamis 10 Des: Ayam Kecap & Orek Tempe</button>
+              <button type="button" onclick="loadRecipeView('jumat_11')" id="rcp-btn-jumat_11" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Jumat 11 Des: Jasuke & Puding Wortel</button>
+            </div>
           </div>
         </div>
 
+        <!-- DETAIL RECIPE CONTAINER -->
         <div id="recipe-detail-display" class="space-y-6">
           <!-- Rendered dynamically -->
         </div>
@@ -900,119 +1191,97 @@
       const display = document.getElementById('recipe-detail-display');
       if (!display) return;
 
-      if (dayKey === 'senin_30') {
-        display.innerHTML = `
-          <!-- Resep 1: Ayam Dadu Tepung Saus Mentega Madu -->
-          <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div>
-                <span class="text-[10px] font-bold uppercase text-red-600 dark:text-red-400 tracking-wider">Komponen Protein Hewani (Target 45g Matang / Porsi)</span>
-                <h3 class="text-base font-bold text-slate-900 dark:text-white">1. Ayam Dadu Tepung Saus Mentega Madu (2.442 Porsi)</h3>
-                <p class="text-xs text-slate-500">Fillet ayam potong dadu 2 cm, marinasi aromatik wijen, digoreng krispi keemasan dan diglaze saus mentega madu.</p>
-              </div>
-              <span class="px-2.5 py-1 rounded-md bg-red-50 dark:bg-red-950 font-bold text-xs text-red-800 dark:text-red-300">Wajan 8 Batch</span>
-            </div>
+      const r = MASTER_RECIPES[dayKey];
+      if (!r) return;
 
-            <table class="w-full text-left text-xs border border-slate-200 dark:border-slate-800">
-              <thead class="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold">
+      display.innerHTML = `
+        <!-- HEADER FORMULA HARI -->
+        <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <span class="text-[10px] font-bold uppercase text-slate-400 tracking-wider block">Standar Formula Dapur SPPG:</span>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white mt-0.5">${r.title}</h3>
+            <p class="text-xs text-slate-500 mt-0.5">${r.subtitle}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold text-xs">${r.totalPorsi}</span>
+            <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs">${r.batchCount}</span>
+          </div>
+        </div>
+
+        <!-- RESEP PROTEIN HEWANI (PROHE) -->
+        <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div>
+              <span class="text-[10px] font-bold uppercase text-red-600 dark:text-red-400 tracking-wider">Komponen Protein Utama (ProHe)</span>
+              <h4 class="text-base font-bold text-slate-900 dark:text-white">${r.prohe.name}</h4>
+              <p class="text-xs text-slate-500">${r.prohe.desc}</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-md bg-red-50 dark:bg-red-950 font-bold text-xs text-red-800 dark:text-red-300">Wajan ÷8 Batch</span>
+          </div>
+
+          <table class="w-full text-left text-xs border border-slate-200 dark:border-slate-800">
+            <thead class="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold">
+              <tr>
+                <th class="p-2.5">Bahan Baku Dapur</th>
+                <th class="p-2.5">Takaran Porsi</th>
+                <th class="p-2.5 text-right">Total Belanja Dapur (PO)</th>
+                <th class="p-2.5 text-right font-bold text-red-700 dark:text-red-400">Per Batch (÷8 Wajan)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-800 dark:text-slate-200 font-medium">
+              ${r.prohe.items.map(it => `
                 <tr>
-                  <th class="p-2.5">Bahan Baku Dapur</th>
-                  <th class="p-2.5">Per Porsi (PB)</th>
-                  <th class="p-2.5 text-right">Total Belanja (2.442 Porsi)</th>
-                  <th class="p-2.5 text-right font-bold text-red-700 dark:text-red-400">Per Batch (÷8 Wajan)</th>
+                  <td class="p-2.5 font-bold">${it.name}</td>
+                  <td class="p-2.5">${it.perPorsi}</td>
+                  <td class="p-2.5 text-right font-num font-bold">${it.po}</td>
+                  <td class="p-2.5 text-right font-num font-bold text-red-700 dark:text-red-400">${it.batch}</td>
                 </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-800 dark:text-slate-200 font-medium">
-                <tr><td class="p-2.5 font-bold">Daging Ayam Fillet Bersih</td><td class="p-2.5">40 g mentah</td><td class="p-2.5 text-right font-num">95,0 kg</td><td class="p-2.5 text-right font-num font-bold text-red-700">11,88 kg</td></tr>
-                <tr><td class="p-2.5 font-bold">Bumbu Marinasi (Bawang Putih, Jahe, Wijen)</td><td class="p-2.5">1,5 g</td><td class="p-2.5 text-right font-num">3,65 kg</td><td class="p-2.5 text-right font-num font-bold text-red-700">456 g</td></tr>
-                <tr><td class="p-2.5 font-bold">Tepung Terigu + Maizena (Rasio 3:1)</td><td class="p-2.5">13 g</td><td class="p-2.5 text-right font-num">32,0 kg</td><td class="p-2.5 text-right font-num font-bold text-red-700">4,00 kg</td></tr>
-                <tr><td class="p-2.5 font-bold">Telur Ayam Pencelup (Egg Wash)</td><td class="p-2.5">4 g</td><td class="p-2.5 text-right font-num">10,0 kg (160 butir)</td><td class="p-2.5 text-right font-num font-bold text-red-700">1,25 kg (20 btr)</td></tr>
-                <tr><td class="p-2.5 font-bold">Mentega / Margarin Saus</td><td class="p-2.5">5 g</td><td class="p-2.5 text-right font-num">12,0 kg</td><td class="p-2.5 text-right font-num font-bold text-red-700">1,50 kg</td></tr>
-                <tr><td class="p-2.5 font-bold">Madu Murni Glaze</td><td class="p-2.5">3 g</td><td class="p-2.5 text-right font-num">7,5 kg</td><td class="p-2.5 text-right font-num font-bold text-red-700">938 g</td></tr>
-                <tr><td class="p-2.5 font-bold">Kecap Manis + Saus Tiram + Bombay</td><td class="p-2.5">9 g</td><td class="p-2.5 text-right font-num">22,5 kg</td><td class="p-2.5 text-right font-num font-bold text-red-700">2,81 kg</td></tr>
-              </tbody>
-            </table>
+              `).join('')}
+            </tbody>
+          </table>
 
-            <div class="p-3.5 bg-slate-50 dark:bg-slate-900/40 rounded-xl text-xs space-y-1 text-slate-700 dark:text-slate-300">
-              <p><strong>Sains Kuliner Chef:</strong> Dadu ayam digoreng pada suhu minyak 170-175 °C selama 5 menit sampai keemasan, tiriskan di rak kawat minimal 2 menit. Saus mentega madu ditumis di wajan terpisah sampai mengental mengkilap, lalu ayam diaduk kilat (tossed) sesaat sebelum packing agar kerenyahannya bertahan 4 jam.</p>
+          <div class="p-3.5 bg-slate-50 dark:bg-slate-900/40 rounded-xl text-xs space-y-1 text-slate-700 dark:text-slate-300">
+            <p><strong>Catatan Sains Kuliner & HACCP Chef:</strong> ${r.prohe.chefNotes}</p>
+          </div>
+        </div>
+
+        <!-- RESEP PROTEIN NABATI (PRONA) -->
+        <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div>
+              <span class="text-[10px] font-bold uppercase text-blue-600 dark:text-blue-400 tracking-wider">Komponen Nabati (ProNa)</span>
+              <h4 class="text-base font-bold text-slate-900 dark:text-white">${r.prona.name}</h4>
+              <p class="text-xs text-slate-500">${r.prona.desc}</p>
             </div>
+            <span class="px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-950 font-bold text-xs text-blue-800 dark:text-blue-300">Wajan ÷8 Batch</span>
           </div>
 
-          <!-- Resep 2: Tahu Bacem Legit -->
-          <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div>
-                <span class="text-[10px] font-bold uppercase text-blue-600 dark:text-blue-400 tracking-wider">Komponen Protein Nabati (Target 35g Matang / Porsi)</span>
-                <h3 class="text-base font-bold text-slate-900 dark:text-white">2. Tahu Bacem Tradisional Air Kelapa (2.442 Porsi)</h3>
-                <p class="text-xs text-slate-500">Tahu putih padat diungkep air kelapa dan gula merah kelapa sampai bumbu meresap hitam karamel.</p>
-              </div>
-              <span class="px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-950 font-bold text-xs text-blue-800 dark:text-blue-300">Wajan Ungkep 8 Batch</span>
-            </div>
-
-            <table class="w-full text-left text-xs border border-slate-200 dark:border-slate-800">
-              <thead class="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold">
+          <table class="w-full text-left text-xs border border-slate-200 dark:border-slate-800">
+            <thead class="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold">
+              <tr>
+                <th class="p-2.5">Bahan Baku Dapur</th>
+                <th class="p-2.5">Takaran Porsi</th>
+                <th class="p-2.5 text-right">Total Belanja Dapur (PO)</th>
+                <th class="p-2.5 text-right font-bold text-blue-700 dark:text-blue-400">Per Batch (÷8 Wajan)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-800 dark:text-slate-200 font-medium">
+              ${r.prona.items.map(it => `
                 <tr>
-                  <th class="p-2.5">Bahan Baku Dapur</th>
-                  <th class="p-2.5">Per Porsi</th>
-                  <th class="p-2.5 text-right">Total Belanja (2.442 Porsi)</th>
-                  <th class="p-2.5 text-right font-bold text-blue-700 dark:text-blue-400">Per Batch (÷8 Wajan)</th>
+                  <td class="p-2.5 font-bold">${it.name}</td>
+                  <td class="p-2.5">${it.perPorsi}</td>
+                  <td class="p-2.5 text-right font-num font-bold">${it.po}</td>
+                  <td class="p-2.5 text-right font-num font-bold text-blue-700 dark:text-blue-400">${it.batch}</td>
                 </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-800 dark:text-slate-200 font-medium">
-                <tr><td class="p-2.5 font-bold">Tahu Putih Segar Padat</td><td class="p-2.5">1 potong (40 g)</td><td class="p-2.5 text-right font-num">2.450 potong (98 kg)</td><td class="p-2.5 text-right font-num font-bold text-blue-700">306 potong (12,25 kg)</td></tr>
-                <tr><td class="p-2.5 font-bold">Air Kelapa Murni</td><td class="p-2.5">14 ml</td><td class="p-2.5 text-right font-num">35,0 L</td><td class="p-2.5 text-right font-num font-bold text-blue-700">4,38 L</td></tr>
-                <tr><td class="p-2.5 font-bold">Gula Merah Kelapa Sisir</td><td class="p-2.5">4,5 g</td><td class="p-2.5 text-right font-num">11,0 kg</td><td class="p-2.5 text-right font-num font-bold text-blue-700">1,38 kg</td></tr>
-                <tr><td class="p-2.5 font-bold">Bumbu Rempah (Bawang, Ketumbar, Lengkuas, Salam)</td><td class="p-2.5">3,5 g</td><td class="p-2.5 text-right font-num">8,5 kg</td><td class="p-2.5 text-right font-num font-bold text-blue-700">1,06 kg</td></tr>
-              </tbody>
-            </table>
-          </div>
-        `;
-      } else if (dayKey === 'jumat_04') {
-        display.innerHTML = `
-          <!-- Resep Kimbab & Karage Bulgogi -->
-          <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div>
-                <span class="text-[10px] font-bold uppercase text-purple-600 dark:text-purple-400 tracking-wider">Formula Inovasi Jumat (2.094 Porsi)</span>
-                <h3 class="text-base font-bold text-slate-900 dark:text-white">Kimbab Roll Sushi Gurih & Karage Ayam Saus Bulgogi</h3>
-                <p class="text-xs text-slate-500">Kombinasi nasi pulen nori kimbab dengan karage ayam juicy dan edamame rebus.</p>
-              </div>
-              <span class="px-2.5 py-1 rounded-md bg-purple-50 dark:bg-purple-950 font-bold text-xs text-purple-800 dark:text-purple-300">Total: 2.094 Porsi</span>
-            </div>
+              `).join('')}
+            </tbody>
+          </table>
 
-            <table class="w-full text-left text-xs border border-slate-200 dark:border-slate-800">
-              <thead class="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold">
-                <tr>
-                  <th class="p-2.5">Bahan Baku Dapur</th>
-                  <th class="p-2.5">Standar Porsi</th>
-                  <th class="p-2.5 text-right">Total Belanja (2.094 Porsi)</th>
-                  <th class="p-2.5 text-right font-bold text-purple-700 dark:text-purple-400">Per Batch (÷8 Wajan)</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-800 dark:text-slate-200 font-medium">
-                <tr><td class="p-2.5 font-bold">Beras Pulen + Ketan (Rasio 9:1)</td><td class="p-2.5">52,5 g</td><td class="p-2.5 text-right font-num">110,0 kg</td><td class="p-2.5 text-right font-num font-bold text-purple-700">13,75 kg</td></tr>
-                <tr><td class="p-2.5 font-bold">Nori Lembaran Besar Kimbab</td><td class="p-2.5">1/4 lembar</td><td class="p-2.5 text-right font-num">450 lembar</td><td class="p-2.5 text-right font-num font-bold text-purple-700">56 lembar</td></tr>
-                <tr><td class="p-2.5 font-bold">Daging Fillet Paha Ayam (Karage)</td><td class="p-2.5">40 g</td><td class="p-2.5 text-right font-num">85,0 kg</td><td class="p-2.5 text-right font-num font-bold text-purple-700">10,63 kg</td></tr>
-                <tr><td class="p-2.5 font-bold">Tepung Tapioka Karage (Crispy)</td><td class="p-2.5">8,5 g</td><td class="p-2.5 text-right font-num">18,0 kg</td><td class="p-2.5 text-right font-num font-bold text-purple-700">2,25 kg</td></tr>
-                <tr><td class="p-2.5 font-bold">Saus Bulgogi (Kecap Asin, Pir, Wijen)</td><td class="p-2.5">10 g</td><td class="p-2.5 text-right font-num">21,0 kg</td><td class="p-2.5 text-right font-num font-bold text-purple-700">2,63 kg</td></tr>
-                <tr><td class="p-2.5 font-bold">Edamame Polong Segar</td><td class="p-2.5">35 g</td><td class="p-2.5 text-right font-num">75,0 kg</td><td class="p-2.5 text-right font-num font-bold text-purple-700">9,38 kg</td></tr>
-              </tbody>
-            </table>
+          <div class="p-3.5 bg-slate-50 dark:bg-slate-900/40 rounded-xl text-xs space-y-1 text-slate-700 dark:text-slate-300">
+            <p><strong>Standar QC Dapur Chef:</strong> ${r.prona.chefNotes}</p>
           </div>
-        `;
-      } else {
-        display.innerHTML = `
-          <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm space-y-3">
-            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Formula Resep Standar Dapur SPPG Pekajangan 04</h3>
-            <p class="text-xs text-slate-500">Rincian takaran gramasi belanja mentah, susut masak, bumbu aromatik, dan pembagian batch wajan (÷8) telah tercatat lengkap pada buku resep master di sistem.</p>
-            <div class="pt-2">
-              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
-                Tersedia Lengkap di Dokumen Buku Resep Master
-              </span>
-            </div>
-          </div>
-        `;
-      }
+        </div>
+      `;
     }
 
     // RENDER 2-WEEK MENU CYCLE (30 NOV - 11 DES 2026)
