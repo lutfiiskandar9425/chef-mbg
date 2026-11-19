@@ -985,31 +985,142 @@ html_code = r"""<!DOCTYPE html>
       }
     }
 
-    // RENDER 2-WEEK MENU CYCLE
+    // RENDER 2-WEEK MENU CYCLE (30 NOV - 11 DES 2026)
     function renderCycleCards() {
       const container = document.getElementById('cycle-cards-grid');
       if (!container) return;
 
       const cycles = [
-        { day: "Senin", menu: "Nasi Gurih, Lele Crispy, Sambal Bajak, Tempe Orek, Lalap Timun Kol, Jeruk", status: "Disetujui Gizi" },
-        { day: "Selasa", menu: "Nasi Gurih, Semur Telur Rollade, Tahu Goreng, Mix Vigie, Pisang", status: "Disetujui Gizi" },
-        { day: "Rabu", menu: "Nasi Putih, Chicken Pop Kecap, Tempe Goreng, Tumis Labu Jagung, Kelengkeng", status: "Disetujui Gizi" },
-        { day: "Kamis", menu: "Roti Bun Burger, Telur Ceplok, Tempe Tepung, Selada Timun, Saus Pedas/Tomat, Jeruk", status: "Sedang Berjalan" },
-        { day: "Jumat", menu: "Nasi Uduk, Ayam Suwir Opor, Tahu Bacem, Sayur Bening Bayam Jagung, Semangka", status: "Disetujui Gizi" }
+        // MINGGU 1: 30 NOV - 04 DES 2026
+        { week: "Minggu 1", date: "30 Nov", day: "Senin", karbo: "Nasi", prohe: "Ayam Dadu Tepung", side: "Saus Mentega Madu", prona: "Tahu Bacem", sayur: "Tumis Labu / Lalap", buah: "Buah Naga", pb: 2250, pk: 192, total: 2442, status: "Plan Ahli Gizi" },
+        { week: "Minggu 1", date: "01 Des", day: "Selasa", karbo: "Nasi", prohe: "Sosis Telur Grill", side: "Saus Teriyaki", prona: "Tempe Goreng", sayur: "Mix Vegetable", buah: "Anggur", pb: 2250, pk: 192, total: 2442, status: "Plan Ahli Gizi" },
+        { week: "Minggu 1", date: "02 Des", day: "Rabu", karbo: "Nasi", prohe: "Ayam Goreng", side: "Sambal Bawang", prona: "Tahu Dadu Tepung", sayur: "Tumis Sawi Wortel", buah: "Jeruk", pb: 2250, pk: 192, total: 2442, status: "Plan Ahli Gizi" },
+        { week: "Minggu 1", date: "03 Des", day: "Kamis", karbo: "Roti Bun (Burger)", prohe: "Telor Ceplok", side: "Saus Pedas / Saus Tomat", prona: "Tempe Tepung", sayur: "Timun Selada", buah: "Kelengkeng", pb: 2250, pk: 192, total: 2442, status: "Plan Ahli Gizi" },
+        { week: "Minggu 1", date: "04 Des", day: "Jumat", karbo: "Kimbab", prohe: "Karage", side: "Saus Bulgogi Pedas/Manis", prona: "Edamame", sayur: "Isian Sayur Roll", buah: "Pisang", pb: 1902, pk: 192, total: 2094, status: "Plan Ahli Gizi" },
+
+        // MINGGU 2: 07 - 11 DES 2026
+        { week: "Minggu 2", date: "07 Des", day: "Senin", karbo: "Nasi", prohe: "Ayam Katsu", side: "Sambal Ijo", prona: "Tempe Goreng", sayur: "Lalap Timun + Kol", buah: "Pisang", pb: 2250, pk: 192, total: 2442, status: "Plan Ahli Gizi" },
+        { week: "Minggu 2", date: "08 Des", day: "Selasa", karbo: "Nasi", prohe: "Telur Katsu", side: "Saus BBQ", prona: "Tahu Tepung Dadu", sayur: "Mix Vigie", buah: "Jeruk", pb: 2250, pk: 192, total: 2442, status: "Plan Ahli Gizi" },
+        { week: "Minggu 2", date: "09 Des", day: "Rabu", karbo: "Roti", prohe: "Patty Ayam Katsu", side: "Mayones Gurih", prona: "Edamame", sayur: "Coleslaw", buah: "Kelengkeng", pb: 2250, pk: 192, total: 2442, status: "Plan Ahli Gizi" },
+        { week: "Minggu 2", date: "10 Des", day: "Kamis", karbo: "Nasi", prohe: "Ayam Dadu Kecap", side: "Kuah Kecap Aromatik", prona: "Orek Tempe", sayur: "Labu Wortel", buah: "Anggur", pb: 2250, pk: 192, total: 2442, status: "Plan Ahli Gizi" },
+        { week: "Minggu 2", date: "11 Des", day: "Jumat", karbo: "Jasuke (Jagung Susu Keju)", prohe: "Telur Rebus Bulat", side: "Taburan Keju Cheddar", prona: "Kacang Polong", sayur: "Puding Wortel", buah: "Buah Naga", pb: 1902, pk: 192, total: 2094, status: "Plan Ahli Gizi" }
       ];
 
-      container.innerHTML = cycles.map(c => `
-        <div class="bg-white dark:bg-[#111726] border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-2 shadow-xs">
-          <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-2">
-            <span class="font-bold text-slate-900 dark:text-white text-sm">${c.day}</span>
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${c.status === 'Sedang Berjalan' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${c.status}</span>
+      container.innerHTML = `
+        <div class="col-span-full space-y-6">
+          <!-- MINGGU 1 -->
+          <div>
+            <div class="flex items-center justify-between mb-3 border-b border-slate-200 dark:border-slate-800 pb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Siklus Minggu I: 30 November &mdash; 04 Desember 2026</h3>
+              </div>
+              <span class="text-xs text-slate-500">Senin-Kamis 2.442 Porsi &bull; Jumat 2.094 Porsi</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+              ${cycles.filter(c => c.week === 'Minggu 1').map(c => `
+                <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-4 space-y-3 shadow-xs hover:border-emerald-500/50 transition-all">
+                  <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-2">
+                    <div>
+                      <span class="text-[10px] text-slate-400 font-bold block">${c.date}</span>
+                      <span class="font-extrabold text-slate-900 dark:text-white text-sm">${c.day}</span>
+                    </div>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60">${c.total} Porsi</span>
+                  </div>
+
+                  <div class="space-y-1.5 text-xs">
+                    <div class="flex items-start gap-1.5">
+                      <span class="text-[10px] font-bold uppercase text-amber-600 bg-amber-50 dark:bg-amber-950/50 px-1 rounded shrink-0">Karbo</span>
+                      <span class="text-slate-800 dark:text-slate-200 font-bold">${c.karbo}</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="text-[10px] font-bold uppercase text-red-600 bg-red-50 dark:bg-red-950/50 px-1 rounded shrink-0">ProHe</span>
+                      <span class="text-slate-800 dark:text-slate-200 font-bold">${c.prohe}</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="text-[10px] font-bold uppercase text-purple-600 bg-purple-50 dark:bg-purple-950/50 px-1 rounded shrink-0">Side</span>
+                      <span class="text-slate-600 dark:text-slate-400 font-medium">${c.side}</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="text-[10px] font-bold uppercase text-blue-600 bg-blue-50 dark:bg-blue-950/50 px-1 rounded shrink-0">ProNa</span>
+                      <span class="text-slate-700 dark:text-slate-300">${c.prona}</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="text-[10px] font-bold uppercase text-emerald-600 bg-emerald-50 dark:bg-emerald-950/50 px-1 rounded shrink-0">Sayur</span>
+                      <span class="text-slate-700 dark:text-slate-300">${c.sayur}</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="text-[10px] font-bold uppercase text-rose-600 bg-rose-50 dark:bg-rose-950/50 px-1 rounded shrink-0">Buah</span>
+                      <span class="text-slate-700 dark:text-slate-300">${c.buah}</span>
+                    </div>
+                  </div>
+
+                  <div class="pt-2 text-[10px] text-slate-400 border-t border-slate-100 dark:border-slate-800 flex justify-between">
+                    <span>PB: ${c.pb}</span>
+                    <span>PK: ${c.pk}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
           </div>
-          <p class="text-xs text-slate-700 dark:text-slate-300 font-medium">${c.menu}</p>
-          <div class="pt-2 text-[10px] text-slate-400 border-t border-slate-100 dark:border-slate-800">
-            5 Komponen Gizi Lengkap
+
+          <!-- MINGGU 2 -->
+          <div>
+            <div class="flex items-center justify-between mb-3 border-b border-slate-200 dark:border-slate-800 pb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Siklus Minggu II: 07 &mdash; 11 Desember 2026</h3>
+              </div>
+              <span class="text-xs text-slate-500">Senin-Kamis 2.442 Porsi &bull; Jumat 2.094 Porsi</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+              ${cycles.filter(c => c.week === 'Minggu 2').map(c => `
+                <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-4 space-y-3 shadow-xs hover:border-blue-500/50 transition-all">
+                  <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-2">
+                    <div>
+                      <span class="text-[10px] text-slate-400 font-bold block">${c.date}</span>
+                      <span class="font-extrabold text-slate-900 dark:text-white text-sm">${c.day}</span>
+                    </div>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 border border-blue-200/60">${c.total} Porsi</span>
+                  </div>
+
+                  <div class="space-y-1.5 text-xs">
+                    <div class="flex items-start gap-1.5">
+                      <span class="text-[10px] font-bold uppercase text-amber-600 bg-amber-50 dark:bg-amber-950/50 px-1 rounded shrink-0">Karbo</span>
+                      <span class="text-slate-800 dark:text-slate-200 font-bold">${c.karbo}</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="text-[10px] font-bold uppercase text-red-600 bg-red-50 dark:bg-red-950/50 px-1 rounded shrink-0">ProHe</span>
+                      <span class="text-slate-800 dark:text-slate-200 font-bold">${c.prohe}</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="text-[10px] font-bold uppercase text-purple-600 bg-purple-50 dark:bg-purple-950/50 px-1 rounded shrink-0">Side</span>
+                      <span class="text-slate-600 dark:text-slate-400 font-medium">${c.side}</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="text-[10px] font-bold uppercase text-blue-600 bg-blue-50 dark:bg-blue-950/50 px-1 rounded shrink-0">ProNa</span>
+                      <span class="text-slate-700 dark:text-slate-300">${c.prona}</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="text-[10px] font-bold uppercase text-emerald-600 bg-emerald-50 dark:bg-emerald-950/50 px-1 rounded shrink-0">Sayur</span>
+                      <span class="text-slate-700 dark:text-slate-300">${c.sayur}</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="text-[10px] font-bold uppercase text-rose-600 bg-rose-50 dark:bg-rose-950/50 px-1 rounded shrink-0">Buah</span>
+                      <span class="text-slate-700 dark:text-slate-300">${c.buah}</span>
+                    </div>
+                  </div>
+
+                  <div class="pt-2 text-[10px] text-slate-400 border-t border-slate-100 dark:border-slate-800 flex justify-between">
+                    <span>PB: ${c.pb}</span>
+                    <span>PK: ${c.pk}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
           </div>
         </div>
-      `).join('');
+      `;
     }
 
     // BROADCAST DIRECTIVE VIA WHATSAPP (ONE-CLICK VOLUNTEER DISPATCH)
