@@ -858,114 +858,158 @@
       showToast('Jadwal ' + (dayData ? dayData.dateString : dayKey) + ' dimuat.');
     }
 
-    // RENDER RECIPE CARDS (2,000+ PORTIONS SCALER)
+    // RENDER RECIPE CARDS (2,000+ PORTIONS SCALER - SIKLUS 30 NOV - 11 DES 2026)
     function renderRecipeCards() {
       const container = document.getElementById('recipe-cards-container');
       if (!container) return;
 
-      const dayData = MBG_DATA[currentDayKey];
-      if (!dayData) return;
+      container.innerHTML = `
+        <!-- DAY SELECTOR KHUSUS MASTER RESEP -->
+        <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-2xl shadow-sm space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Pilih Formula Resep Harian:</span>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">Skala 2.442 / 2.094 Porsi (÷8 Batch)</span>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button type="button" onclick="loadRecipeView('senin_30')" id="rcp-btn-senin_30" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-xs cursor-pointer">Senin 30 Nov: Ayam Madu & Tahu Bacem</button>
+            <button type="button" onclick="loadRecipeView('selasa_01')" id="rcp-btn-selasa_01" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Selasa 01 Des: Sosis Telur Teriyaki</button>
+            <button type="button" onclick="loadRecipeView('rabu_02')" id="rcp-btn-rabu_02" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Rabu 02 Des: Ayam Lengkuas Sambal</button>
+            <button type="button" onclick="loadRecipeView('kamis_03')" id="rcp-btn-kamis_03" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Kamis 03 Des: Burger Telur Ceplok</button>
+            <button type="button" onclick="loadRecipeView('jumat_04')" id="rcp-btn-jumat_04" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Jumat 04 Des: Kimbab & Karage Bulgogi</button>
+            <button type="button" onclick="loadRecipeView('jumat_11')" id="rcp-btn-jumat_11" class="rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Jumat 11 Des: Jasuke & Puding Wortel</button>
+          </div>
+        </div>
 
-      if (currentDayKey === 'senin_23') {
-        container.innerHTML = `
-          <!-- Resep 1: Nasi Gurih -->
-          <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-xl p-5 shadow-xs space-y-4">
+        <div id="recipe-detail-display" class="space-y-6">
+          <!-- Rendered dynamically -->
+        </div>
+      `;
+
+      loadRecipeView('senin_30');
+    }
+
+    function loadRecipeView(dayKey) {
+      document.querySelectorAll('.rcp-tab-btn').forEach(b => {
+        b.className = 'rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer';
+      });
+      const activeBtn = document.getElementById('rcp-btn-' + dayKey);
+      if (activeBtn) {
+        activeBtn.className = 'rcp-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-xs cursor-pointer';
+      }
+
+      const display = document.getElementById('recipe-detail-display');
+      if (!display) return;
+
+      if (dayKey === 'senin_30') {
+        display.innerHTML = `
+          <!-- Resep 1: Ayam Dadu Tepung Saus Mentega Madu -->
+          <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div>
-                <span class="text-[10px] font-bold uppercase text-emerald-600 dark:text-emerald-400 tracking-wider">Komponen Karbohidrat (1 kg Beras = 19 Porsi)</span>
-                <h3 class="text-base font-bold text-slate-900 dark:text-white">1. Nasi Gurih Santan Serai (2.211 Porsi)</h3>
-                <p class="text-xs text-slate-500">Kapasitas Dapur: Dibagi 8 Batch Dandang / Rice Cooker Besar (±276 porsi/batch)</p>
+                <span class="text-[10px] font-bold uppercase text-red-600 dark:text-red-400 tracking-wider">Komponen Protein Hewani (Target 45g Matang / Porsi)</span>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">1. Ayam Dadu Tepung Saus Mentega Madu (2.442 Porsi)</h3>
+                <p class="text-xs text-slate-500">Fillet ayam potong dadu 2 cm, marinasi aromatik wijen, digoreng krispi keemasan dan diglaze saus mentega madu.</p>
               </div>
-              <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 font-bold text-xs text-slate-800 dark:text-slate-200">8 Batch Wajan</span>
+              <span class="px-2.5 py-1 rounded-md bg-red-50 dark:bg-red-950 font-bold text-xs text-red-800 dark:text-red-300">Wajan 8 Batch</span>
             </div>
 
-            <table class="w-full text-left text-xs border border-slate-200">
-              <thead class="bg-slate-50 text-slate-700 font-bold">
+            <table class="w-full text-left text-xs border border-slate-200 dark:border-slate-800">
+              <thead class="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold">
                 <tr>
-                  <th class="p-2">Bahan Bersih</th>
-                  <th class="p-2">Per Porsi</th>
-                  <th class="p-2 text-right">Total 2.211 Porsi</th>
-                  <th class="p-2 text-right font-bold text-emerald-700">Per Batch (÷8)</th>
+                  <th class="p-2.5">Bahan Baku Dapur</th>
+                  <th class="p-2.5">Per Porsi (PB)</th>
+                  <th class="p-2.5 text-right">Total Belanja (2.442 Porsi)</th>
+                  <th class="p-2.5 text-right font-bold text-red-700 dark:text-red-400">Per Batch (÷8 Wajan)</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-slate-200 text-slate-800 font-medium">
-                <tr><td class="p-2 font-bold">Beras Pulen</td><td class="p-2">52,6 g</td><td class="p-2 text-right font-num">116,37 kg</td><td class="p-2 text-right font-num font-bold text-emerald-800">14,55 kg</td></tr>
-                <tr><td class="p-2 font-bold">Santan Kental</td><td class="p-2">21,1 ml</td><td class="p-2 text-right font-num">46,55 L</td><td class="p-2 text-right font-num font-bold text-emerald-800">5,82 L</td></tr>
-                <tr><td class="p-2 font-bold">Air Bersih Bersuhu Hangat</td><td class="p-2">42,1 ml</td><td class="p-2 text-right font-num">93,09 L</td><td class="p-2 text-right font-num font-bold text-emerald-800">11,64 L</td></tr>
-                <tr><td class="p-2 font-bold">Garam Halus</td><td class="p-2">0,79 g</td><td class="p-2 text-right font-num">1,75 kg</td><td class="p-2 text-right font-num font-bold text-emerald-800">218,2 g</td></tr>
-                <tr><td class="p-2 font-bold">Serai Geprek</td><td class="p-2">1,05 g</td><td class="p-2 text-right font-num">2,33 kg</td><td class="p-2 text-right font-num font-bold text-emerald-800">290,9 g</td></tr>
+              <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-800 dark:text-slate-200 font-medium">
+                <tr><td class="p-2.5 font-bold">Daging Ayam Fillet Bersih</td><td class="p-2.5">40 g mentah</td><td class="p-2.5 text-right font-num">95,0 kg</td><td class="p-2.5 text-right font-num font-bold text-red-700">11,88 kg</td></tr>
+                <tr><td class="p-2.5 font-bold">Bumbu Marinasi (Bawang Putih, Jahe, Wijen)</td><td class="p-2.5">1,5 g</td><td class="p-2.5 text-right font-num">3,65 kg</td><td class="p-2.5 text-right font-num font-bold text-red-700">456 g</td></tr>
+                <tr><td class="p-2.5 font-bold">Tepung Terigu + Maizena (Rasio 3:1)</td><td class="p-2.5">13 g</td><td class="p-2.5 text-right font-num">32,0 kg</td><td class="p-2.5 text-right font-num font-bold text-red-700">4,00 kg</td></tr>
+                <tr><td class="p-2.5 font-bold">Telur Ayam Pencelup (Egg Wash)</td><td class="p-2.5">4 g</td><td class="p-2.5 text-right font-num">10,0 kg (160 butir)</td><td class="p-2.5 text-right font-num font-bold text-red-700">1,25 kg (20 btr)</td></tr>
+                <tr><td class="p-2.5 font-bold">Mentega / Margarin Saus</td><td class="p-2.5">5 g</td><td class="p-2.5 text-right font-num">12,0 kg</td><td class="p-2.5 text-right font-num font-bold text-red-700">1,50 kg</td></tr>
+                <tr><td class="p-2.5 font-bold">Madu Murni Glaze</td><td class="p-2.5">3 g</td><td class="p-2.5 text-right font-num">7,5 kg</td><td class="p-2.5 text-right font-num font-bold text-red-700">938 g</td></tr>
+                <tr><td class="p-2.5 font-bold">Kecap Manis + Saus Tiram + Bombay</td><td class="p-2.5">9 g</td><td class="p-2.5 text-right font-num">22,5 kg</td><td class="p-2.5 text-right font-num font-bold text-red-700">2,81 kg</td></tr>
               </tbody>
             </table>
 
-            <div class="p-3 bg-slate-50 rounded-lg text-xs space-y-1 text-slate-700">
-              <p><strong>Catatan Sains Kuliner Chef:</strong> Panaskan santan dan dedaunan perlahan sampai muncul gelembung kecil di pinggir wajan (jangan mendidih keras agar santan tidak pecah). Siramkan ke dandang. Tahan di suhu penyimpanan &ge; 60 &deg;C. Maksimal 4 jam harus habis.</p>
+            <div class="p-3.5 bg-slate-50 dark:bg-slate-900/40 rounded-xl text-xs space-y-1 text-slate-700 dark:text-slate-300">
+              <p><strong>Sains Kuliner Chef:</strong> Dadu ayam digoreng pada suhu minyak 170-175 °C selama 5 menit sampai keemasan, tiriskan di rak kawat minimal 2 menit. Saus mentega madu ditumis di wajan terpisah sampai mengental mengkilap, lalu ayam diaduk kilat (tossed) sesaat sebelum packing agar kerenyahannya bertahan 4 jam.</p>
             </div>
           </div>
 
-          <!-- Resep 2: Lele Crispy -->
-          <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-xl p-5 shadow-xs space-y-4">
+          <!-- Resep 2: Tahu Bacem Legit -->
+          <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div>
-                <span class="text-[10px] font-bold uppercase text-blue-600 dark:text-blue-400 tracking-wider">Komponen Protein Hewani (ProHe 60 g Matang)</span>
-                <h3 class="text-base font-bold text-slate-900 dark:text-white">2. Lele Crispy Fillet (2.211 Porsi)</h3>
-                <p class="text-xs text-slate-500">Fillet lele bebas duri dan kulit, digoreng krispi keemasan (suhu minyak 170-175 °C)</p>
+                <span class="text-[10px] font-bold uppercase text-blue-600 dark:text-blue-400 tracking-wider">Komponen Protein Nabati (Target 35g Matang / Porsi)</span>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">2. Tahu Bacem Tradisional Air Kelapa (2.442 Porsi)</h3>
+                <p class="text-xs text-slate-500">Tahu putih padat diungkep air kelapa dan gula merah kelapa sampai bumbu meresap hitam karamel.</p>
               </div>
-              <span class="px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-950 font-bold text-xs text-blue-800 dark:text-blue-200">Deep Fryer / Wajan 8 Batch</span>
+              <span class="px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-950 font-bold text-xs text-blue-800 dark:text-blue-300">Wajan Ungkep 8 Batch</span>
             </div>
 
-            <table class="w-full text-left text-xs border border-slate-200">
-              <thead class="bg-slate-50 text-slate-700 font-bold">
+            <table class="w-full text-left text-xs border border-slate-200 dark:border-slate-800">
+              <thead class="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold">
                 <tr>
-                  <th class="p-2">Bahan Baku</th>
-                  <th class="p-2">Per Porsi</th>
-                  <th class="p-2 text-right">Total Belanja (2.211 Porsi)</th>
-                  <th class="p-2 text-right font-bold text-blue-800">Per Batch (÷8)</th>
+                  <th class="p-2.5">Bahan Baku Dapur</th>
+                  <th class="p-2.5">Per Porsi</th>
+                  <th class="p-2.5 text-right">Total Belanja (2.442 Porsi)</th>
+                  <th class="p-2.5 text-right font-bold text-blue-700 dark:text-blue-400">Per Batch (÷8 Wajan)</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-slate-200 text-slate-800 font-medium">
-                <tr><td class="p-2 font-bold">Lele Fillet Segar</td><td class="p-2">60 g</td><td class="p-2 text-right font-num">132,66 kg</td><td class="p-2 text-right font-num font-bold text-blue-800">16,58 kg</td></tr>
-                <tr><td class="p-2 font-bold">Jeruk Nipis Peras</td><td class="p-2">3 g</td><td class="p-2 text-right font-num">6,63 kg</td><td class="p-2 text-right font-num font-bold text-blue-800">829 g</td></tr>
-                <tr><td class="p-2 font-bold">Tepung Terigu</td><td class="p-2">10 g</td><td class="p-2 text-right font-num">22,11 kg</td><td class="p-2 text-right font-num font-bold text-blue-800">2,76 kg</td></tr>
-                <tr><td class="p-2 font-bold">Tepung Maizena (Crispy)</td><td class="p-2">5 g</td><td class="p-2 text-right font-num">11,05 kg</td><td class="p-2 text-right font-num font-bold text-blue-800">1,38 kg</td></tr>
-                <tr><td class="p-2 font-bold">Minyak Goreng Sawit</td><td class="p-2">9 ml</td><td class="p-2 text-right font-num">19,90 L</td><td class="p-2 text-right font-num font-bold text-blue-800">2,49 L</td></tr>
+              <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-800 dark:text-slate-200 font-medium">
+                <tr><td class="p-2.5 font-bold">Tahu Putih Segar Padat</td><td class="p-2.5">1 potong (40 g)</td><td class="p-2.5 text-right font-num">2.450 potong (98 kg)</td><td class="p-2.5 text-right font-num font-bold text-blue-700">306 potong (12,25 kg)</td></tr>
+                <tr><td class="p-2.5 font-bold">Air Kelapa Murni</td><td class="p-2.5">14 ml</td><td class="p-2.5 text-right font-num">35,0 L</td><td class="p-2.5 text-right font-num font-bold text-blue-700">4,38 L</td></tr>
+                <tr><td class="p-2.5 font-bold">Gula Merah Kelapa Sisir</td><td class="p-2.5">4,5 g</td><td class="p-2.5 text-right font-num">11,0 kg</td><td class="p-2.5 text-right font-num font-bold text-blue-700">1,38 kg</td></tr>
+                <tr><td class="p-2.5 font-bold">Bumbu Rempah (Bawang, Ketumbar, Lengkuas, Salam)</td><td class="p-2.5">3,5 g</td><td class="p-2.5 text-right font-num">8,5 kg</td><td class="p-2.5 text-right font-num font-bold text-blue-700">1,06 kg</td></tr>
               </tbody>
             </table>
-
-            <div class="p-3 bg-slate-50 rounded-lg text-xs space-y-1 text-slate-700">
-              <p><strong>Standar QC Chef:</strong> Goreng selama 4-5 menit sampai warna emas kekuningan. Tiriskan di rak kawat minimal 2 menit sebelum masuk wadah stasiun. Jangan tutup rapat saat masih panas agar uap air tidak membuat krispi lembek.</p>
+          </div>
+        `;
+      } else if (dayKey === 'jumat_04') {
+        display.innerHTML = `
+          <!-- Resep Kimbab & Karage Bulgogi -->
+          <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <span class="text-[10px] font-bold uppercase text-purple-600 dark:text-purple-400 tracking-wider">Formula Inovasi Jumat (2.094 Porsi)</span>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">Kimbab Roll Sushi Gurih & Karage Ayam Saus Bulgogi</h3>
+                <p class="text-xs text-slate-500">Kombinasi nasi pulen nori kimbab dengan karage ayam juicy dan edamame rebus.</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-md bg-purple-50 dark:bg-purple-950 font-bold text-xs text-purple-800 dark:text-purple-300">Total: 2.094 Porsi</span>
             </div>
+
+            <table class="w-full text-left text-xs border border-slate-200 dark:border-slate-800">
+              <thead class="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold">
+                <tr>
+                  <th class="p-2.5">Bahan Baku Dapur</th>
+                  <th class="p-2.5">Standar Porsi</th>
+                  <th class="p-2.5 text-right">Total Belanja (2.094 Porsi)</th>
+                  <th class="p-2.5 text-right font-bold text-purple-700 dark:text-purple-400">Per Batch (÷8 Wajan)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-800 dark:text-slate-200 font-medium">
+                <tr><td class="p-2.5 font-bold">Beras Pulen + Ketan (Rasio 9:1)</td><td class="p-2.5">52,5 g</td><td class="p-2.5 text-right font-num">110,0 kg</td><td class="p-2.5 text-right font-num font-bold text-purple-700">13,75 kg</td></tr>
+                <tr><td class="p-2.5 font-bold">Nori Lembaran Besar Kimbab</td><td class="p-2.5">1/4 lembar</td><td class="p-2.5 text-right font-num">450 lembar</td><td class="p-2.5 text-right font-num font-bold text-purple-700">56 lembar</td></tr>
+                <tr><td class="p-2.5 font-bold">Daging Fillet Paha Ayam (Karage)</td><td class="p-2.5">40 g</td><td class="p-2.5 text-right font-num">85,0 kg</td><td class="p-2.5 text-right font-num font-bold text-purple-700">10,63 kg</td></tr>
+                <tr><td class="p-2.5 font-bold">Tepung Tapioka Karage (Crispy)</td><td class="p-2.5">8,5 g</td><td class="p-2.5 text-right font-num">18,0 kg</td><td class="p-2.5 text-right font-num font-bold text-purple-700">2,25 kg</td></tr>
+                <tr><td class="p-2.5 font-bold">Saus Bulgogi (Kecap Asin, Pir, Wijen)</td><td class="p-2.5">10 g</td><td class="p-2.5 text-right font-num">21,0 kg</td><td class="p-2.5 text-right font-num font-bold text-purple-700">2,63 kg</td></tr>
+                <tr><td class="p-2.5 font-bold">Edamame Polong Segar</td><td class="p-2.5">35 g</td><td class="p-2.5 text-right font-num">75,0 kg</td><td class="p-2.5 text-right font-num font-bold text-purple-700">9,38 kg</td></tr>
+              </tbody>
+            </table>
           </div>
         `;
       } else {
-        container.innerHTML = `
-          <!-- Resep Hari Ini (Kamis 19 Nov) -->
-          <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-xl p-5 shadow-xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div>
-                <span class="text-[10px] font-bold uppercase text-emerald-600 dark:text-emerald-400 tracking-wider">Formula Hari Ini (2.742 Porsi)</span>
-                <h3 class="text-base font-bold text-slate-900 dark:text-white">Telur Ceplok & Tempe Goreng Tepung (Burger Meal)</h3>
-                <p class="text-xs text-slate-500">Pekajangan 04 &bull; Menyuplai SMK 1, MTs, dan 2 Posyandu</p>
-              </div>
-              <span class="px-2.5 py-1 rounded-md bg-emerald-50 dark:bg-emerald-950 font-bold text-xs text-emerald-800 dark:text-emerald-300">Total: 2.742 Butir Telur</span>
+        display.innerHTML = `
+          <div class="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm space-y-3">
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Formula Resep Standar Dapur SPPG Pekajangan 04</h3>
+            <p class="text-xs text-slate-500">Rincian takaran gramasi belanja mentah, susut masak, bumbu aromatik, dan pembagian batch wajan (÷8) telah tercatat lengkap pada buku resep master di sistem.</p>
+            <div class="pt-2">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
+                Tersedia Lengkap di Dokumen Buku Resep Master
+              </span>
             </div>
-
-            <table class="w-full text-left text-xs border border-slate-200">
-              <thead class="bg-slate-50 text-slate-700 font-bold">
-                <tr>
-                  <th class="p-2">Bahan Baku Dapur</th>
-                  <th class="p-2">Target Matang / Porsi</th>
-                  <th class="p-2 text-right">Total Belanja Dapur</th>
-                  <th class="p-2 text-right font-bold text-emerald-800">Batch Wajan (÷8)</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-200 text-slate-800 font-medium">
-                <tr><td class="p-2 font-bold">Roti Bun Siap Pakai</td><td class="p-2">1 buah (±50 g)</td><td class="p-2 text-right font-num font-bold">2.742 buah (457 pack)</td><td class="p-2 text-right font-num">57 pack</td></tr>
-                <tr><td class="p-2 font-bold">Telur Ayam Ras (Besar)</td><td class="p-2">1 butir (±60 g matang)</td><td class="p-2 text-right font-num font-bold">2.742 butir (164,5 kg)</td><td class="p-2 text-right font-num">342 butir</td></tr>
-                <tr><td class="p-2 font-bold">Tempe Segar Padat (ProNa)</td><td class="p-2">30 g matang bertepung</td><td class="p-2 text-right font-num font-bold">74,03 kg mentah</td><td class="p-2 text-right font-num">9,25 kg</td></tr>
-                <tr><td class="p-2 font-bold">Tepung Terigu + Beras Adonan</td><td class="p-2">10,5 g tepung</td><td class="p-2 text-right font-num font-bold">28,79 kg</td><td class="p-2 text-right font-num">3,60 kg</td></tr>
-                <tr><td class="p-2 font-bold">Timun & Selada Segar</td><td class="p-2">30 g matang</td><td class="p-2 text-right font-num font-bold">90,5 kg kotor</td><td class="p-2 text-right font-num">11,3 kg</td></tr>
-              </tbody>
-            </table>
           </div>
         `;
       }
